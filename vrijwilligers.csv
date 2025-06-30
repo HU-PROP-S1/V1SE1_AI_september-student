@@ -1,0 +1,100 @@
+,project,jaar,aantal_vrijwilligers,aantal_uren,percentage_buitenwerk,actief,succes
+0,Toekomstmakers,2022,2,30,0.64,True,True
+1,Blije Rugzak,2022,7,172,0.95,True,True
+2,Oog voor Ouderen,2018,1,35,0.93,True,True
+3,Toekomstmakers,2017,4,36,0.7,True,True
+4,Oog voor Ouderen,2023,2,36,0.88,True,True
+5,"Kachel Lager, Trui Aan",2019,3,29,0.63,True,True
+6,"Kachel Lager, Trui Aan",2018,1,33,0.89,True,True
+7,Toekomstmakers,2019,4,103,0.49,True,True
+8,Toekomstmakers,2016,6,103,0.61,True,True
+9,"Kachel Lager, Trui Aan",2020,1,32,0.65,True,True
+10,Plastic Plukploeg,2022,1,25,0.58,True,False
+11,Kringloop Karavaan,2015,2,34,0.35,True,False
+12,Oog voor Ouderen,2015,7,65,0.72,True,True
+13,Groen in de Straat,2020,7,208,0.98,True,True
+14,De vriendendienst,2023,2,36,0.73,True,True
+15,Blije Rugzak,2018,5,98,0.95,True,True
+16,Toekomstmakers,2024,4,34,0.38,True,True
+17,Oog voor Ouderen,2020,1,25,0.98,True,True
+18,Bij & Bloei,2024,2,32,0.67,True,True
+19,Toekomstmakers,2017,1,32,0.45,True,False
+20,Park Poetsdag,2015,3,72,0.66,True,True
+21,Oog voor Ouderen,2020,1,32,0.46,True,False
+22,Bij & Bloei,2017,3,34,0.48,True,True
+23,Plastic Plukploeg,2016,1,28,0.49,True,False
+24,De vriendendienst,2018,1,30,0.88,True,True
+25,"Kachel Lager, Trui Aan",2015,1,29,0.83,True,False
+26,Groen in de Straat,2017,2,33,0.7,True,True
+27,Park Poetsdag,2015,1,26,0.88,True,True
+28,Kringloop Karavaan,2016,1,25,0.34,True,False
+29,De vriendendienst,2018,3,66,0.72,True,True
+30,Bij & Bloei,2022,2,36,0.62,True,True
+31,Plastic Plukploeg,2022,3,32,0.58,True,True
+32,Toekomstmakers,2023,1,36,0.59,True,False
+33,Oog voor Ouderen,2022,8,249,0.85,True,True
+34,Kringloop Karavaan,2017,2,32,0.43,True,False
+35,Toekomstmakers,2020,1,29,0.83,True,False
+36,Plastic Plukploeg,2015,0,0,0.0,False,False
+37,"Kachel Lager, Trui Aan",2015,4,35,0.64,True,True
+38,Oog voor Ouderen,2020,7,213,0.91,True,True
+39,Oog voor Ouderen,2024,5,133,0.67,True,True
+40,Plastic Plukploeg,2014,6,99,0.72,True,True
+41,Groen in de Straat,2017,0,0,0.0,False,False
+42,Toekomstmakers,2014,2,35,0.73,True,True
+43,Blije Rugzak,2015,1,35,0.81,True,True
+44,Blije Rugzak,2023,3,32,0.75,True,True
+45,Kringloop Karavaan,2016,2,32,0.75,True,True
+46,Blije Rugzak,2018,4,70,0.86,True,True
+47,Bij & Bloei,2017,1,35,0.52,True,False
+48,Bij & Bloei,2024,2,32,0.28,True,False
+49,Groen in de Straat,2022,1,36,0.63,True,False
+50,"Kachel Lager, Trui Aan",2018,7,104,0.75,True,True
+51,De vriendendienst,2017,1,29,0.29,True,False
+52,Kringloop Karavaan,2019,2,34,0.43,True,False
+53,De vriendendienst,2018,3,31,0.89,True,True
+54,"Kachel Lager, Trui Aan",2017,4,95,0.79,True,True
+55,Park Poetsdag,2018,1,36,0.78,True,True
+56,Bij & Bloei,2020,0,0,0.0,False,False
+57,"Kachel Lager, Trui Aan",2024,7,177,0.94,True,True
+58,Park Poetsdag,2017,2,27,0.4,True,True
+59,Plastic Plukploeg,2016,7,104,0.72,True,True
+60,Toekomstmakers,2022,6,142,0.86,True,True
+61,Groen in de Straat,2017,1,28,0.14,True,False
+62,Kringloop Karavaan,2015,6,104,0.88,True,True
+63,Blije Rugzak,2020,3,69,0.93,True,True
+64,Plastic Plukploeg,2018,2,36,0.87,True,True
+65,Oog voor Ouderen,2018,1,26,0.76,True,False
+66,Toekomstmakers,2024,1,34,0.66,True,False
+67,De vriendendienst,2016,1,36,0.8,True,True
+68,Groen in de Straat,2019,3,66,0.52,True,True
+69,Oog voor Ouderen,2014,3,35,0.49,True,True
+70,Kringloop Karavaan,2020,1,35,0.83,True,True
+71,"Kachel Lager, Trui Aan",2016,5,31,0.93,True,True
+72,Groen in de Straat,2019,2,35,0.97,True,True
+73,Bij & Bloei,2014,1,29,0.25,True,False
+74,Bij & Bloei,2024,2,27,0.79,True,True
+75,De vriendendienst,2022,1,34,0.62,True,False
+76,Toekomstmakers,2017,2,34,0.95,True,True
+77,Bij & Bloei,2018,0,0,0.0,False,False
+78,De vriendendienst,2023,2,35,0.97,True,True
+79,"Kachel Lager, Trui Aan",2020,7,208,0.78,True,True
+80,"Kachel Lager, Trui Aan",2014,1,36,0.6,True,False
+81,Blije Rugzak,2017,4,34,0.7,True,True
+82,Oog voor Ouderen,2022,1,29,0.81,True,True
+83,Oog voor Ouderen,2016,4,105,0.97,True,True
+84,Toekomstmakers,2024,1,32,0.64,True,True
+85,Toekomstmakers,2019,1,33,0.31,True,False
+86,Oog voor Ouderen,2014,2,33,0.11,True,False
+87,Bij & Bloei,2015,2,30,0.97,True,True
+88,"Kachel Lager, Trui Aan",2019,2,34,0.51,True,False
+89,Kringloop Karavaan,2022,4,69,0.25,True,True
+90,Toekomstmakers,2016,0,0,0.0,False,False
+91,Oog voor Ouderen,2020,2,32,0.78,True,True
+92,Oog voor Ouderen,2014,1,30,0.69,True,True
+93,"Kachel Lager, Trui Aan",2024,1,36,0.84,True,True
+94,Bij & Bloei,2017,1,36,0.81,True,False
+95,Bij & Bloei,2017,0,0,0.0,False,False
+96,De vriendendienst,2014,1,34,0.43,True,False
+97,Toekomstmakers,2024,2,29,0.99,True,True
+98,Kringloop Karavaan,2014,1,35,0.48,True,False
