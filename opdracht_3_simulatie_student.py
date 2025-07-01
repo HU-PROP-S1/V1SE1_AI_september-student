@@ -33,15 +33,16 @@ debuginfo = True
     Implementeer onderstaande functie om te achterhalen of de tegenstander 'Always defect' is.
 
 """
-def is_always_defect(opponent_history):
+def is_always_defect(my_history, opponent_history):
     """
     Checkt of je tegenstander 'Always defect' is.
 
     Args:
-        opponent_history (list[bool]): Een lijst met de door jouw tegenstander gespeelde acties in het verleden.
+        my_history (list[bool]): Een lijst met jouw gespeelde acties in het verleden.
+        opponent_history (list[bool]): Een lijst de door jouw tegenstander gespeelde acties in het verleden.
 
     Returns:
-        bool: True als je tegenstander 'Always defect' is, ander False.
+        bool: True als je tegenstander 'Always defect' is, anders False.
     """
     return
 
@@ -57,7 +58,7 @@ def play_against_always_defect(my_history, opponent_history):
 
     Args:
         my_history (list[bool]): Een lijst met jouw gespeelde acties in het verleden.
-        opponent_history (list[bool]): Een lijst met de door jouw tegenstander gespeelde acties in het verleden.
+        opponent_history (list[bool]): Een lijst de door jouw tegenstander gespeelde acties in het verleden.
 
     Returns:
         bool: Jouw actie; samenwerken (True) of zelfzuchtig zijn (False).
@@ -69,15 +70,16 @@ def play_against_always_defect(my_history, opponent_history):
     Implementeer onderstaande functie om te achterhalen of de tegenstander 'Alternate' is.
 
 """
-def is_alternate(opponent_history):
+def is_alternate(my_history, opponent_history):
     """
     Checkt of je tegenstander 'Alternate' is.
 
     Args:
-        opponent_history (list[bool]): Een lijst met de door jouw tegenstander gespeelde acties in het verleden.
+        my_history (list[bool]): Een lijst met jouw gespeelde acties in het verleden.
+        opponent_history (list[bool]): Een lijst de door jouw tegenstander gespeelde acties in het verleden.
 
     Returns:
-        bool: True als je tegenstander 'Alternate' is, ander False.
+        bool: True als je tegenstander 'Alternate' is, anders False.
     """
     return
 
@@ -93,7 +95,7 @@ def play_against_alternate(my_history, opponent_history):
 
     Args:
         my_history (list[bool]): Een lijst met jouw gespeelde acties in het verleden.
-        opponent_history (list[bool]): Een lijst met de door jouw tegenstander gespeelde acties in het verleden.
+        opponent_history (list[bool]): Een lijst de door jouw tegenstander gespeelde acties in het verleden.
 
     Returns:
         bool: Jouw actie; samenwerken (True) of zelfzuchtig zijn (False).
@@ -105,15 +107,16 @@ def play_against_alternate(my_history, opponent_history):
     Implementeer onderstaande functie om te achterhalen of de tegenstander 'Tit for tat' is.
 
 """
-def is_tit_for_tat(opponent_history):
+def is_tit_for_tat(my_history, opponent_history):
     """
     Checkt of je tegenstander 'Tit for tat' is.
 
     Args:
-        opponent_history (list[bool]): Een lijst met de door jouw tegenstander gespeelde acties in het verleden.
+        my_history (list[bool]): Een lijst met jouw gespeelde acties in het verleden.
+        opponent_history (list[bool]): Een lijst de door jouw tegenstander gespeelde acties in het verleden.
 
     Returns:
-        bool: True als je tegenstander 'Tit for tat' is, ander False.
+        bool: True als je tegenstander 'Tit for tat' is, anders False.
     """
     return
 
@@ -129,7 +132,7 @@ def play_against_tit_for_tat(my_history, opponent_history):
 
     Args:
         my_history (list[bool]): Een lijst met jouw gespeelde acties in het verleden.
-        opponent_history (list[bool]): Een lijst met de door jouw tegenstander gespeelde acties in het verleden.
+        opponent_history (list[bool]): Een lijst de door jouw tegenstander gespeelde acties in het verleden.
 
     Returns:
         bool: Jouw actie; samenwerken (True) of zelfzuchtig zijn (False).
@@ -148,7 +151,7 @@ def play_against_unknown(my_history, opponent_history):
 
     Args:
         my_history (list[bool]): Een lijst met jouw gespeelde acties in het verleden.
-        opponent_history (list[bool]): Een lijst met de door jouw tegenstander gespeelde acties in het verleden.
+        opponent_history (list[bool]): Een lijst de door jouw tegenstander gespeelde acties in het verleden.
 
     Returns:
         bool: Jouw actie; samenwerken (True) of zelfzuchtig zijn (False).
@@ -159,35 +162,30 @@ def play_against_unknown(my_history, opponent_history):
 8. Optioneel: Implementatie is_final_round
     Implementeer onderstaande functie om te achterhalen of je in de laatste ronde zit.
 
-"""
-def is_final_round(opponent_history):
-    """
-    Checkt of je in de laatste ronde zit.
-
     Args:
-        opponent_history (list[bool]): Een lijst met de door jouw tegenstander gespeelde acties in het verleden.
+        my_history (list[bool]): Een lijst met jouw gespeelde acties in het verleden.
+        opponent_history (list[bool]): Een lijst de door jouw tegenstander gespeelde acties in het verleden.
 
     Returns:
-        bool: True als je in de laatste ronde zit, False als dat niet zo is.
-    """
+        bool: True als je in de laatste ronde zit, anders False.
+
+"""
+def is_final_round(my_history, opponent_history):
     return
 
 """
 9. Optioneel: Implementatie play_final_round
     Implementeer onderstaande functie om de beste actie te spelen in de laatste ronde.
 
-"""
-def play_final_round(my_history, opponent_history):
-    """
-    Geeft de actie terug die gespeeld zal worden in de laatste ronde.
-
     Args:
         my_history (list[bool]): Een lijst met jouw gespeelde acties in het verleden.
-        opponent_history (list[bool]): Een lijst met de door jouw tegenstander gespeelde acties in het verleden.
+        opponent_history (list[bool]): Een lijst de door jouw tegenstander gespeelde acties in het verleden.
 
     Returns:
         bool: Jouw actie; samenwerken (True) of zelfzuchtig zijn (False).
-    """
+
+"""
+def play_final_round(my_history, opponent_history):
     return
 
 
@@ -198,20 +196,20 @@ def strategy(my_history, opponent_history):
 
     Args:
         my_history (list[bool]): Een lijst met jouw gespeelde acties in het verleden.
-        opponent_history (list[bool]): Een lijst met de door jouw tegenstander gespeelde acties in het verleden.
+        opponent_history (list[bool]): Een lijst de door jouw tegenstander gespeelde acties in het verleden.
 
     Returns:
         bool: Jouw actie; samenwerken (True) of zelfzuchtig zijn (False).
     """
     # 10. Optioneel: uncomment deze code en implementeer is_final_round en play_final_round
-    # if is_final_round(opponent_history):
+    # if is_final_round(my_history, opponent_history):
     #     return play_final_round(my_history, opponent_history)
     
-    if is_always_defect(opponent_history):
+    if is_always_defect(my_history, opponent_history):
         return play_against_always_defect(my_history, opponent_history)
-    elif is_alternate(opponent_history):
+    elif is_alternate(my_history, opponent_history):
         return play_against_alternate(my_history, opponent_history)
-    elif is_tit_for_tat(opponent_history):
+    elif is_tit_for_tat(my_history, opponent_history):
         return play_against_tit_for_tat(my_history, opponent_history)
     else:
         return play_against_unknown(my_history, opponent_history)
