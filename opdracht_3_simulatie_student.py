@@ -162,20 +162,28 @@ def play_against_unknown(my_history, opponent_history):
 8. Optioneel: Implementatie is_final_round
     Implementeer onderstaande functie om te achterhalen of je in de laatste ronde zit.
 
+"""
+def is_final_round(my_history, opponent_history):
+    """
+    Checkt of je in de laatste ronde zit.
+
     Args:
         my_history (list[bool]): Een lijst met jouw gespeelde acties in het verleden.
         opponent_history (list[bool]): Een lijst de door jouw tegenstander gespeelde acties in het verleden.
 
     Returns:
         bool: True als je in de laatste ronde zit, anders False.
-
-"""
-def is_final_round(my_history, opponent_history):
+    """
     return
 
 """
 9. Optioneel: Implementatie play_final_round
     Implementeer onderstaande functie om de beste actie te spelen in de laatste ronde.
+
+"""
+def play_final_round(my_history, opponent_history):
+    """
+    Geeft de actie terug die gespeeld zal worden in de laatste ronde.
 
     Args:
         my_history (list[bool]): Een lijst met jouw gespeelde acties in het verleden.
@@ -183,9 +191,7 @@ def is_final_round(my_history, opponent_history):
 
     Returns:
         bool: Jouw actie; samenwerken (True) of zelfzuchtig zijn (False).
-
-"""
-def play_final_round(my_history, opponent_history):
+    """
     return
 
 
@@ -215,12 +221,42 @@ def strategy(my_history, opponent_history):
         return play_against_unknown(my_history, opponent_history)
 
 def always_defect(my_history, opponent_history):
+    """
+    Geeft de actie terug die 'Always defect' speelt.
+
+    Args:
+        my_history (list[bool]): Een lijst met de gespeelde acties van 'Always defect' in het verleden.
+        opponent_history (list[bool]): Een lijst de door de tegenstander gespeelde acties in het verleden.
+
+    Returns:
+        bool: De gespeelde actie; samenwerken (True) of zelfzuchtig zijn (False).
+    """
     return False
 
 def alternate(my_history, opponent_history):
+    """
+    Geeft de actie terug die 'Alternate' speelt.
+
+    Args:
+        my_history (list[bool]): Een lijst met de gespeelde acties van 'Alternate' in het verleden.
+        opponent_history (list[bool]): Een lijst de door de tegenstander gespeelde acties in het verleden.
+
+    Returns:
+        bool: De gespeelde actie; samenwerken (True) of zelfzuchtig zijn (False).
+    """
     return len(opponent_history) % 2 == 0
 
 def tit_for_tat(my_history, opponent_history):
+    """
+    Geeft de actie terug die 'Tit for tat' speelt.
+
+    Args:
+        my_history (list[bool]): Een lijst met de gespeelde acties van 'Tit for tat' in het verleden.
+        opponent_history (list[bool]): Een lijst de door de tegenstander gespeelde acties in het verleden.
+
+    Returns:
+        bool: De gespeelde actie; samenwerken (True) of zelfzuchtig zijn (False).
+    """
     if not opponent_history:
         return True
     return opponent_history[-1]
@@ -233,6 +269,17 @@ strategies = {
 }
 
 def play_game(strategy1, strategy2, rounds):
+    """
+    Speelt een aantal ronden van het repeated prisoner's dilemma tussen twee agents.
+
+    Args:
+        strategy1 (function): De strategie van agent 1.
+        strategy2 (function): De strategie van agent 2.
+        rounds (int): Het aantal te spelen ronden
+
+    Returns:
+        pair[pair[int, int], list[string]]: de eindscores en eventuele errors.
+    """
     history = []
     errors = []
     for _ in range(rounds):
@@ -249,6 +296,15 @@ def play_game(strategy1, strategy2, rounds):
     return calculate_scores(history), errors
 
 def calculate_scores(history):
+    """
+    Berekent de eindscores.
+
+    Args:
+        history (list[pair[bool, bool]]): De geschiedenis van gespeelde potjes tussen twee strategieën.
+
+    Returns:
+        pair[int, int]: de eindscores van de twee strategieën.
+    """
     payoff_matrix = (
         ((1, 1), (3, 0)),
         ((0, 3), (2, 2))
@@ -263,6 +319,16 @@ def calculate_scores(history):
     return score1, score2
 
 def run_tournament(strategies, rounds):
+    """
+    Speelt het repeated prisoner's dilemma in tournooi vorm met de gegeven strategieën voor het gegeven aantal ronden.
+
+    Args:
+        strategies (dict[string, function]): Een dictionary van strategieën die meespelen.
+        rounds (int): het aantal ronden dat wordt gespeeld.
+
+    Returns:
+        pair[dict, dict]: de resultaten van het tournooi en de eindscores.
+    """
     results = {}
     total_scores = {name: 0 for name in strategies}
 
