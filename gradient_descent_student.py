@@ -15,7 +15,7 @@ Let op! Het is niet toegestaan om bestaande modules te importeren en te
 """
 
 
-def gradient_descent(x, y, num_iterations=1000, learning_rate=0.00001):
+def gradient_descent(x, y, num_iterations=1000, learning_rate=0.0001):
     """
     Traint de coefficienten a en b voor het lineaire regressiemodel ŷ = a + b * x met de gradient descent methode.
 
@@ -32,7 +32,6 @@ def gradient_descent(x, y, num_iterations=1000, learning_rate=0.00001):
     coefficients = [0, 0]
 
     return coefficients
-
 
 """
 ==========================[ HU TESTRAAMWERK ]================================
@@ -76,12 +75,13 @@ def test_gradient_descent():
     }
 
     testcases = [
-        ((data['presence'], data['grade'], 1), [0.0017100000000000001, 0.106738]),
-        ((data['presence'], data['grade'], 10), [0.001971128042286284, 0.08534573346895256]),
-        ((data['presence'], data['grade'], 100), [0.007869807143101246, 0.08525494404155816]),
-        ((data['presence'], data['grade'], 1000), [0.06618154711177889, 0.08435661812087089]),
-        ((data['presence'], data['grade'], 10000), [0.5867493223145714, 0.07633697188513236]),
-        ((data['presence'], data['grade'], 100000), [2.5447058397558733, 0.0461735246592242]),
+        ((data['presence'], data['grade'], 1), [0.00106875, 0.06671125]),
+        ((data['presence'], data['grade'], 10), [0.0017250805547328813, 0.0853495859860294]),
+        ((data['presence'], data['grade'], 100), [0.005413509270166133, 0.0852927847242298]),
+        ((data['presence'], data['grade'], 1000), [0.042033257409484846, 0.08472863642441471]),
+        ((data['presence'], data['grade'], 10000), [0.38301565829600587, 0.0794756062562346]),
+        ((data['presence'], data['grade'], 100000), [2.1618476839980865, 0.052071674936483736]),
+        ((data['presence'], data['grade'], 524288), [2.8178099369653586, 0.041966198832538895]),
     ]
 
     for case in testcases:
