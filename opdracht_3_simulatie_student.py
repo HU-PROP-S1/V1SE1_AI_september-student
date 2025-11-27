@@ -358,7 +358,7 @@ if __name__ == "__main__":
     for strategy, score in positions:
         print("{}: {}".format(strategy, score))
         
-    if positions[0][0] == "Jouw strategie" or positions[1][0] == "Jouw strategie":
+    if positions[0][0] == "Jouw strategie" == "Jouw strategie":
         print("\x1b[32m")
         print("Jouw strategie heeft gewonnen!")
 
