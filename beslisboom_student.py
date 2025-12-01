@@ -61,7 +61,8 @@ def test_predict_with_tree():
         assert len(data['succes_prediction']) > i, f"De kolom 'succes_prediction' is niet volledig gevuld."
         if data['succes'][i] == data['succes_prediction'][i]:
             correct += 1
-    assert correct > 83, f"De prestatie van de beslisboom is niet hoger dan 83.8%, namelijk: {round((correct / 99) * 100, 1)}%."
+    assert correct > 84, f"De prestatie van de beslisboom is niet hoger dan 84.8%, namelijk: {round((correct / 99) * 100, 1)}%."
+    print(f"De prestatie van de beslisboom is: {round((correct / 99) * 100, 1)}%.")
 
 if __name__ == '__main__':
     try:
