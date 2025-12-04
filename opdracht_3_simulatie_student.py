@@ -9,9 +9,8 @@ Opdracht: simulatie
 Peter van den Berg (peter.vandenberg@hu.nl)
 
 Opdracht:
-Werk onderstaande functies uit. Elke functie krijgt een niet-lege en
-ongesorteerde lijst *lst* met gehele getallen (int) als argument.
-Voeg commentaar toe om je code toe te lichten.
+Werk onderstaande functies uit, om de tegenstanders 'Always defect',
+'Tit for tat' en 'Alternate te verslaan'.
 
 Je kunt je functies testen met het gegeven raamwerk door het bestand
 uit te voeren (of met behulp van `pytest`, als je weet hoe dat werkt).
