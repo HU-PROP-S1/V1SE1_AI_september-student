@@ -21,12 +21,16 @@
             box-sizing: border-box;
         }
 
+        html {
+            overflow-y: auto;
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
-            padding: 2rem;
-            min-height: 100vh;
+            padding: 0.5rem;
+            overflow-y: auto;
         }
 
         .container {
@@ -37,15 +41,15 @@
         .top-section {
             display: grid;
             grid-template-columns: 400px 1fr;
-            gap: 2rem;
-            margin-bottom: 2rem;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
             align-items: stretch;
         }
 
         .input-section {
             background: var(--bg-secondary);
-            padding: 1.5rem;
-            border-radius: 16px;
+            padding: 0.5rem;
+            border-radius: 10px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             border: 1px solid var(--grid-border);
             display: flex;
@@ -53,10 +57,10 @@
         }
 
         .section-label {
-            font-size: 1.1rem;
+            font-size: 0.9rem;
             font-weight: 600;
             color: var(--text-primary);
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
         }
 
         .input-matrix {
@@ -87,8 +91,8 @@
 
         .network-section {
             background: var(--bg-secondary);
-            padding: 2rem;
-            border-radius: 16px;
+            padding: 1rem;
+            border-radius: 10px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             border: 1px solid var(--grid-border);
             flex: 1;
@@ -98,33 +102,33 @@
 
         .network-container {
             display: flex;
-            gap: 4rem;
+            gap: 2.5rem;
             align-items: center;
             justify-content: center;
             position: relative;
-            min-height: 500px;
+            min-height: 250px;
         }
 
         .layer {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.25rem;
             position: relative;
             z-index: 10;
         }
 
         .layer-label {
-            font-size: 0.85rem;
+            font-size: 0.7rem;
             font-weight: 600;
             color: var(--text-secondary);
             text-align: center;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.2rem;
         }
 
         .neurons {
             display: flex;
             flex-direction: column;
-            gap: 0.3rem;
+            gap: 0.25rem;
         }
 
         .neuron {
@@ -193,16 +197,16 @@
 
         .details-section {
             background: var(--bg-secondary);
-            padding: 1.5rem;
-            border-radius: 16px;
+            padding: 0.5rem;
+            border-radius: 10px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             border: 1px solid var(--grid-border);
-            min-height: 300px;
+            min-height: 150px;
         }
 
         .details-content {
             display: flex;
-            gap: 2rem;
+            gap: 1rem;
             align-items: flex-start;
         }
 
@@ -377,7 +381,7 @@
         </div>
 
         <!-- Details Section -->
-        <div class="details-section" style="margin-top: 2rem; margin-bottom: 2rem;">
+        <div class="details-section" style="margin-top: 0.5rem; margin-bottom: 0;">
             <div class="section-label" id="neuronDetailsLabel">Neuron Details</div>
             <div id="detailsContent" class="details-content">
                 <div class="info-box">
@@ -1593,6 +1597,11 @@
                 for (let i = 0; i < prevActivations.length; i++) {
                     rawResult += prevActivations[i] * weights[i];
                 }
+                
+                let weightedSum = 0;
+                for (let i = 0; i < prevActivations.length; i++) {
+                    weightedSum += prevActivations[i] * weights[i];
+                }
 
                 const resultValue = document.createElement('div');
                 resultValue.style.fontSize = '1.2rem';
@@ -1603,6 +1612,41 @@
                 resultValue.style.marginBottom = '0.5rem';
                 resultValue.textContent = rawResult.toFixed(4);
                 resultDiv.appendChild(resultValue);
+                
+                // Apply Bias checkbox
+                const biasCheckboxLabel = document.createElement('label');
+                biasCheckboxLabel.style.display = 'flex';
+                biasCheckboxLabel.style.alignItems = 'center';
+                biasCheckboxLabel.style.gap = '0.5rem';
+                biasCheckboxLabel.style.cursor = 'pointer';
+                biasCheckboxLabel.style.fontSize = '0.9rem';
+                biasCheckboxLabel.style.marginBottom = '0.5rem';
+
+                const biasCheckbox = document.createElement('input');
+                biasCheckbox.type = 'checkbox';
+                biasCheckbox.checked = false;
+                biasCheckbox.style.width = '18px';
+                biasCheckbox.style.height = '18px';
+                biasCheckbox.style.cursor = 'pointer';
+                
+                const updateResult = () => {
+                    let currentValue = biasCheckbox.checked ? rawResult : weightedSum;
+                    
+                    if (sigmoidCheckboxInput.checked) {
+                        const sigmoidResult = 1 / (1 + Math.exp(-currentValue));
+                        resultValue.textContent = sigmoidResult.toFixed(2);
+                    } else {
+                        resultValue.textContent = currentValue.toFixed(2);
+                    }
+                };
+                
+                biasCheckbox.addEventListener('change', updateResult);
+
+                biasCheckboxLabel.appendChild(biasCheckbox);
+                const biasCheckboxLabelText = document.createElement('span');
+                biasCheckboxLabelText.textContent = 'Apply Bias';
+                biasCheckboxLabel.appendChild(biasCheckboxLabelText);
+                resultDiv.appendChild(biasCheckboxLabel);
 
                 const sigmoidCheckbox = document.createElement('label');
                 sigmoidCheckbox.style.display = 'flex';
@@ -1611,33 +1655,189 @@
                 sigmoidCheckbox.style.cursor = 'pointer';
                 sigmoidCheckbox.style.fontSize = '0.9rem';
 
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = true;
-                checkbox.style.width = '18px';
-                checkbox.style.height = '18px';
-                checkbox.style.cursor = 'pointer';
+                const sigmoidCheckboxInput = document.createElement('input');
+                sigmoidCheckboxInput.type = 'checkbox';
+                sigmoidCheckboxInput.checked = false;
+                sigmoidCheckboxInput.style.width = '18px';
+                sigmoidCheckboxInput.style.height = '18px';
+                sigmoidCheckboxInput.style.cursor = 'pointer';
                 
-                checkbox.addEventListener('change', (e) => {
-                    if (e.target.checked) {
-                        const sigmoidResult = 1 / (1 + Math.exp(-rawResult));
-                        resultValue.textContent = sigmoidResult.toFixed(4);
-                    } else {
-                        resultValue.textContent = rawResult.toFixed(4);
-                    }
-                });
+                sigmoidCheckboxInput.addEventListener('change', updateResult);
 
-                sigmoidCheckbox.appendChild(checkbox);
-                const checkboxLabel = document.createElement('span');
-                checkboxLabel.textContent = 'Apply Sigmoid';
-                sigmoidCheckbox.appendChild(checkboxLabel);
+                sigmoidCheckbox.appendChild(sigmoidCheckboxInput);
+                const sigmoidCheckboxLabelText = document.createElement('span');
+                sigmoidCheckboxLabelText.textContent = 'Apply Sigmoid';
+                sigmoidCheckbox.appendChild(sigmoidCheckboxLabelText);
                 resultDiv.appendChild(sigmoidCheckbox);
 
-                const sigmoidResult = 1 / (1 + Math.exp(-rawResult));
-                resultValue.textContent = sigmoidResult.toFixed(4);
+                // Set initial value based on unchecked state
+                resultValue.textContent = weightedSum.toFixed(2);
 
                 rightColumn.appendChild(resultDiv);
+                
+                // Function to draw sigmoid visualization
+                const drawSigmoidVisualization = () => {
+                    const ctx = canvas.getContext('2d');
+                    const w = canvas.width;
+                    const h = canvas.height;
+                    const padding = 15;
+                    
+                    // Clear canvas
+                    ctx.clearRect(0, 0, w, h);
+                    
+                    // Calculate positions
+                    const xMin = -6;
+                    const xMax = 6;
+                    const yMin = 0;
+                    const yMax = 1;
+                    
+                    const zeroX = padding + ((0 - xMin) / (xMax - xMin)) * (w - 2 * padding);
+                    const bottomY = h - padding; // y=0 is at the bottom
+                    
+                    // Draw main axes
+                    ctx.strokeStyle = '#9ca3af';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    
+                    // Vertical axis at x=0
+                    ctx.moveTo(zeroX, padding);
+                    ctx.lineTo(zeroX, h - padding);
+                    
+                    // Horizontal axis at y=0 (bottom)
+                    ctx.moveTo(padding, bottomY);
+                    ctx.lineTo(w - padding, bottomY);
+                    
+                    ctx.stroke();
+                    
+                    // Draw axis labels
+                    ctx.fillStyle = '#6b7280';
+                    ctx.font = '9px sans-serif';
+                    ctx.textAlign = 'center';
+                    
+                    // X-axis labels (along bottom)
+                    const xLabels = [-6, -3, 0, 3, 6];
+                    for (const xVal of xLabels) {
+                        const x = padding + ((xVal - xMin) / (xMax - xMin)) * (w - 2 * padding);
+                        ctx.fillText(xVal.toString(), x, bottomY + 12);
+                    }
+                    
+                    // Y-axis labels (along x=0 line)
+                    ctx.textAlign = 'right';
+                    const yLabels = [0.5, 1];
+                    for (const yVal of yLabels) {
+                        const y = h - padding - ((yVal - yMin) / (yMax - yMin)) * (h - 2 * padding);
+                        ctx.fillText(yVal.toFixed(1), zeroX - 5, y + 3);
+                    }
+                    
+                    // Draw sigmoid curve
+                    ctx.strokeStyle = '#3b82f6';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    
+                    for (let i = 0; i <= w - 2 * padding; i++) {
+                        const x = xMin + (i / (w - 2 * padding)) * (xMax - xMin);
+                        const sigmoid = 1 / (1 + Math.exp(-x));
+                        const canvasX = padding + i;
+                        const canvasY = h - padding - ((sigmoid - yMin) / (yMax - yMin)) * (h - 2 * padding);
+                        
+                        if (i === 0) {
+                            ctx.moveTo(canvasX, canvasY);
+                        } else {
+                            ctx.lineTo(canvasX, canvasY);
+                        }
+                    }
+                    ctx.stroke();
+                    
+                    // Calculate sigmoid result for visualization
+                    const currentValue = biasCheckbox.checked ? rawResult : weightedSum;
+                    const sigmoidResult = 1 / (1 + Math.exp(-currentValue));
+                    
+                    // Draw current value point
+                    const clampedX = Math.max(xMin, Math.min(xMax, currentValue));
+                    const pointX = padding + ((clampedX - xMin) / (xMax - xMin)) * (w - 2 * padding);
+                    const pointY = h - padding - ((sigmoidResult - yMin) / (yMax - yMin)) * (h - 2 * padding);
+                    
+                    // Draw point
+                    ctx.fillStyle = '#ef4444';
+                    ctx.beginPath();
+                    ctx.arc(pointX, pointY, 4, 0, 2 * Math.PI);
+                    ctx.fill();
+                    
+                    // Draw guide lines from point to axes
+                    ctx.strokeStyle = '#ef4444';
+                    ctx.setLineDash([2, 2]);
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    // Vertical line to x-axis
+                    ctx.moveTo(pointX, pointY);
+                    ctx.lineTo(pointX, bottomY);
+                    // Horizontal line to y-axis
+                    ctx.moveTo(pointX, pointY);
+                    ctx.lineTo(zeroX, pointY);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    
+                    // Update value display
+                    valueDiv.textContent = `Input: ${currentValue.toFixed(2)} → Output: ${sigmoidResult.toFixed(3)}`;
+                };
+                
+                // Update sigmoid checkbox listener to show/hide visualization
+                sigmoidCheckboxInput.addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        sigmoidDiv.style.display = 'block';
+                        drawSigmoidVisualization();
+                    } else {
+                        sigmoidDiv.style.display = 'none';
+                    }
+                });
+                
+                // Update bias checkbox to redraw when checked/unchecked (if sigmoid is visible)
+                biasCheckbox.addEventListener('change', () => {
+                    if (sigmoidCheckboxInput.checked) {
+                        drawSigmoidVisualization();
+                    }
+                });
+                
                 container.appendChild(rightColumn);
+                
+                // Add sigmoid visualization as THIRD column
+                const sigmoidColumn = document.createElement('div');
+                sigmoidColumn.className = 'column';
+                
+                const sigmoidDiv = document.createElement('div');
+                sigmoidDiv.style.padding = '1rem';
+                sigmoidDiv.style.background = 'var(--bg-primary)';
+                sigmoidDiv.style.borderRadius = '8px';
+                sigmoidDiv.style.border = '1px solid var(--grid-border)';
+                sigmoidDiv.style.display = 'none'; // Hidden by default
+                
+                const sigmoidTitle = document.createElement('div');
+                sigmoidTitle.style.fontSize = '0.85rem';
+                sigmoidTitle.style.fontWeight = '600';
+                sigmoidTitle.style.color = 'var(--text-primary)';
+                sigmoidTitle.style.marginBottom = '0.75rem';
+                sigmoidTitle.textContent = 'Sigmoid Function';
+                sigmoidDiv.appendChild(sigmoidTitle);
+                
+                // Canvas for sigmoid curve
+                const canvas = document.createElement('canvas');
+                canvas.width = 200;
+                canvas.height = 120;
+                canvas.style.width = '100%';
+                canvas.style.height = 'auto';
+                canvas.style.borderRadius = '4px';
+                sigmoidDiv.appendChild(canvas);
+                
+                // Value display
+                const valueDiv = document.createElement('div');
+                valueDiv.style.marginTop = '0.5rem';
+                valueDiv.style.fontSize = '0.75rem';
+                valueDiv.style.color = 'var(--text-secondary)';
+                valueDiv.style.textAlign = 'center';
+                sigmoidDiv.appendChild(valueDiv);
+                
+                sigmoidColumn.appendChild(sigmoidDiv);
+                container.appendChild(sigmoidColumn);
             }
 
             calculateInputInfluence(targetLayer, targetNeuron) {
