@@ -402,6 +402,8 @@
                 this.isEditingWeights = false;
                 this.drawTimeout = null;
                 this.showInputInInfluence = false;
+                this.applyBiasChecked = false;  // Remember checkbox state during session
+                this.applySigmoidChecked = false;  // Remember checkbox state during session
                 
                 // Initialize weights and biases
                 this.weights = [];
@@ -1075,7 +1077,7 @@
                 
                 const predictionElement = document.getElementById('predictionDisplay');
                 if (predictionElement) {
-                    predictionElement.textContent = `Predicted: ${maxIndex} (${(maxValue * 100).toFixed(1)}%)`;
+                    predictionElement.textContent = `Predicted: ${maxIndex} (${(maxValue * 100).toFixed(0)}%)`;
                 }
             }
 
@@ -1624,7 +1626,7 @@
 
                 const biasCheckbox = document.createElement('input');
                 biasCheckbox.type = 'checkbox';
-                biasCheckbox.checked = false;
+                biasCheckbox.checked = this.applyBiasChecked;
                 biasCheckbox.style.width = '18px';
                 biasCheckbox.style.height = '18px';
                 biasCheckbox.style.cursor = 'pointer';
@@ -1640,7 +1642,10 @@
                     }
                 };
                 
-                biasCheckbox.addEventListener('change', updateResult);
+                biasCheckbox.addEventListener('change', (e) => {
+                    this.applyBiasChecked = e.target.checked;
+                    updateResult();
+                });
 
                 biasCheckboxLabel.appendChild(biasCheckbox);
                 const biasCheckboxLabelText = document.createElement('span');
@@ -1657,12 +1662,15 @@
 
                 const sigmoidCheckboxInput = document.createElement('input');
                 sigmoidCheckboxInput.type = 'checkbox';
-                sigmoidCheckboxInput.checked = false;
+                sigmoidCheckboxInput.checked = this.applySigmoidChecked;
                 sigmoidCheckboxInput.style.width = '18px';
                 sigmoidCheckboxInput.style.height = '18px';
                 sigmoidCheckboxInput.style.cursor = 'pointer';
                 
-                sigmoidCheckboxInput.addEventListener('change', updateResult);
+                sigmoidCheckboxInput.addEventListener('change', (e) => {
+                    this.applySigmoidChecked = e.target.checked;
+                    updateResult();
+                });
 
                 sigmoidCheckbox.appendChild(sigmoidCheckboxInput);
                 const sigmoidCheckboxLabelText = document.createElement('span');
@@ -1674,6 +1682,42 @@
                 resultValue.textContent = weightedSum.toFixed(2);
 
                 rightColumn.appendChild(resultDiv);
+                
+                // Create sigmoid visualization elements BEFORE defining the draw function
+                const sigmoidColumn = document.createElement('div');
+                sigmoidColumn.className = 'column';
+                
+                const sigmoidDiv = document.createElement('div');
+                sigmoidDiv.style.padding = '1rem';
+                sigmoidDiv.style.background = 'var(--bg-primary)';
+                sigmoidDiv.style.borderRadius = '8px';
+                sigmoidDiv.style.border = '1px solid var(--grid-border)';
+                sigmoidDiv.style.display = 'none'; // Hidden by default
+                
+                const sigmoidTitle = document.createElement('div');
+                sigmoidTitle.style.fontSize = '0.85rem';
+                sigmoidTitle.style.fontWeight = '600';
+                sigmoidTitle.style.color = 'var(--text-primary)';
+                sigmoidTitle.style.marginBottom = '0.75rem';
+                sigmoidTitle.textContent = 'Sigmoid Function';
+                sigmoidDiv.appendChild(sigmoidTitle);
+                
+                // Canvas for sigmoid curve
+                const canvas = document.createElement('canvas');
+                canvas.width = 200;
+                canvas.height = 120;
+                canvas.style.width = '100%';
+                canvas.style.height = 'auto';
+                canvas.style.borderRadius = '4px';
+                sigmoidDiv.appendChild(canvas);
+                
+                // Value display
+                const valueDiv = document.createElement('div');
+                valueDiv.style.marginTop = '0.5rem';
+                valueDiv.style.fontSize = '0.75rem';
+                valueDiv.style.color = 'var(--text-secondary)';
+                valueDiv.style.textAlign = 'center';
+                sigmoidDiv.appendChild(valueDiv);
                 
                 // Function to draw sigmoid visualization
                 const drawSigmoidVisualization = () => {
@@ -1778,7 +1822,7 @@
                     ctx.setLineDash([]);
                     
                     // Update value display
-                    valueDiv.textContent = `Input: ${currentValue.toFixed(2)} → Output: ${sigmoidResult.toFixed(3)}`;
+                    valueDiv.textContent = `Input: ${currentValue.toFixed(2)} → Output: ${sigmoidResult.toFixed(2)}`;
                 };
                 
                 // Update sigmoid checkbox listener to show/hide visualization
@@ -1791,6 +1835,12 @@
                     }
                 });
                 
+                // Show sigmoid on load if checkbox is checked
+                if (sigmoidCheckboxInput.checked) {
+                    sigmoidDiv.style.display = 'block';
+                    drawSigmoidVisualization();
+                }
+                
                 // Update bias checkbox to redraw when checked/unchecked (if sigmoid is visible)
                 biasCheckbox.addEventListener('change', () => {
                     if (sigmoidCheckboxInput.checked) {
@@ -1798,45 +1848,8 @@
                     }
                 });
                 
-                container.appendChild(rightColumn);
-                
-                // Add sigmoid visualization as THIRD column
-                const sigmoidColumn = document.createElement('div');
-                sigmoidColumn.className = 'column';
-                
-                const sigmoidDiv = document.createElement('div');
-                sigmoidDiv.style.padding = '1rem';
-                sigmoidDiv.style.background = 'var(--bg-primary)';
-                sigmoidDiv.style.borderRadius = '8px';
-                sigmoidDiv.style.border = '1px solid var(--grid-border)';
-                sigmoidDiv.style.display = 'none'; // Hidden by default
-                
-                const sigmoidTitle = document.createElement('div');
-                sigmoidTitle.style.fontSize = '0.85rem';
-                sigmoidTitle.style.fontWeight = '600';
-                sigmoidTitle.style.color = 'var(--text-primary)';
-                sigmoidTitle.style.marginBottom = '0.75rem';
-                sigmoidTitle.textContent = 'Sigmoid Function';
-                sigmoidDiv.appendChild(sigmoidTitle);
-                
-                // Canvas for sigmoid curve
-                const canvas = document.createElement('canvas');
-                canvas.width = 200;
-                canvas.height = 120;
-                canvas.style.width = '100%';
-                canvas.style.height = 'auto';
-                canvas.style.borderRadius = '4px';
-                sigmoidDiv.appendChild(canvas);
-                
-                // Value display
-                const valueDiv = document.createElement('div');
-                valueDiv.style.marginTop = '0.5rem';
-                valueDiv.style.fontSize = '0.75rem';
-                valueDiv.style.color = 'var(--text-secondary)';
-                valueDiv.style.textAlign = 'center';
-                sigmoidDiv.appendChild(valueDiv);
-                
                 sigmoidColumn.appendChild(sigmoidDiv);
+                container.appendChild(rightColumn);
                 container.appendChild(sigmoidColumn);
             }
 
