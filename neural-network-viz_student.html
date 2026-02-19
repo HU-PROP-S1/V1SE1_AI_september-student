@@ -1,0 +1,1901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neural Network Visualizer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #fafafa;
+            --bg-secondary: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --grid-border: #e5e7eb;
+            --accent-blue: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .top-section {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            align-items: stretch;
+        }
+
+        .input-section {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--grid-border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section-label {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .input-matrix {
+            display: grid;
+            gap: 3px;
+            background: var(--grid-border);
+            padding: 3px;
+            border-radius: 6px;
+            grid-template-columns: repeat(5, 40px);
+        }
+
+        .input-cell {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.1s ease;
+        }
+
+        .input-cell:hover {
+            transform: scale(1.05);
+        }
+
+        .network-section {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--grid-border);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .network-container {
+            display: flex;
+            gap: 4rem;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            min-height: 500px;
+        }
+
+        .layer {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .layer-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .neurons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .neuron {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid var(--grid-border);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .neuron:hover {
+            transform: scale(1.15);
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .neuron.selected {
+            border-color: var(--accent-blue);
+            border-width: 3px;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .add-neuron-button {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #dbeafe;
+            border: 1px dashed #93c5fd;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #3b82f6;
+            line-height: 0;
+            padding: 0;
+            padding-bottom: 2px;
+        }
+
+        .add-neuron-button:hover {
+            transform: scale(1.15);
+            border: 2px solid #3b82f6;
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .add-neuron-button:active {
+            transform: scale(1.05);
+        }
+
+        .weights-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .details-section {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--grid-border);
+            min-height: 300px;
+        }
+
+        .details-content {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+
+        .weight-matrix {
+            display: inline-grid;
+            gap: 2px;
+            background: var(--grid-border);
+            padding: 2px;
+            border-radius: 4px;
+        }
+
+        .weight-cell {
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 3px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .activation-matrix {
+            display: inline-grid;
+            gap: 2px;
+            background: var(--grid-border);
+            padding: 2px;
+            border-radius: 4px;
+        }
+
+        .activation-cell {
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 3px;
+        }
+
+        .bias-section {
+            padding: 1rem;
+            background: var(--bg-primary);
+            border-radius: 8px;
+        }
+
+        .bias-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .bias-input {
+            width: 120px;
+            padding: 0.5rem;
+            border: 1px solid var(--grid-border);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .button-section {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        button {
+            background: #e5e7eb;
+            color: #374151;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background: #d1d5db;
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .info-box {
+            padding: 1rem;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .info-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .matrix-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .backprop-panel {
+            position: absolute;
+            right: 1.5rem;
+            top: 1.5rem;
+            background: #fef3c7;
+            border: 2px solid #fbbf24;
+            padding: 1rem;
+            border-radius: 12px;
+            width: 200px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-section">
+            <!-- Input Section -->
+            <div class="input-section">
+                <div class="section-label">Input (5×5)</div>
+                <div id="inputMatrix" class="input-matrix"></div>
+                <div class="button-section">
+                    <button id="clearButton">Clear</button>
+                    <button id="randomButton">Random</button>
+                </div>
+                <div style="margin-top: 0.75rem;">
+                    <input type="text" id="charInput" placeholder="Type a character" maxlength="1" 
+                           style="width: 100%; padding: 0.5rem; border: 1px solid var(--grid-border); border-radius: 6px; font-size: 1rem; text-align: center;">
+                </div>
+                <div class="button-section" style="margin-top: 0.75rem;">
+                    <button id="clearWeightsButton">Clear Weights</button>
+                    <button id="randomizeButton">Random Weights</button>
+                </div>
+                
+                <!-- Prediction Display -->
+                <div style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-primary); border-radius: 8px; border: 1px solid var(--grid-border);">
+                    <div id="predictionDisplay" style="font-size: 1.1rem; font-weight: 600; color: var(--text-primary); padding: 0.75rem 1rem; background: var(--bg-secondary); border-radius: 6px; text-align: center;">
+                        Predicted: - (0.0%)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Network Visualization -->
+            <div class="network-section" style="position: relative;">
+                <svg id="weightsSvg" class="weights-svg"></svg>
+                <div id="networkContainer" class="network-container"></div>
+            </div>
+        </div>
+
+        <!-- Details Section -->
+        <div class="details-section" style="margin-top: 2rem; margin-bottom: 2rem;">
+            <div class="section-label" id="neuronDetailsLabel">Neuron Details</div>
+            <div id="detailsContent" class="details-content">
+                <div class="info-box">
+                    <div class="info-text">Click a neuron to see details...</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        class NeuralNetworkVisualizer {
+            constructor() {
+                // Network architecture: [25, 15, 10] (updated to 15 detectors)
+                this.layers = [25, 15, 10];
+                this.inputData = [[0,1,1,1,0],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[0,1,1,1,0]]; // Initialize with digit 0
+                this.isDrawing = false;
+                this.isEditingWeights = false;
+                this.drawTimeout = null;
+                this.showInputInInfluence = false;
+                
+                // Initialize weights and biases
+                this.weights = [];
+                this.biases = [];
+                this.initializeNetwork();
+                
+                // Activations for each layer
+                this.activations = [];
+                for (let i = 0; i < this.layers.length; i++) {
+                    this.activations.push(new Array(this.layers[i]).fill(0));
+                }
+                
+                // Selected neuron
+                this.selectedLayer = null;
+                this.selectedNeuron = null;
+                
+                this.init();
+            }
+
+            initializeNetwork() {
+                // Initialize weights and biases to zero
+                this.weights = [];
+                this.biases = [];
+                
+                for (let i = 0; i < this.layers.length - 1; i++) {
+                    const inputSize = this.layers[i];
+                    const outputSize = this.layers[i + 1];
+                    
+                    const layerWeights = [];
+                    
+                    for (let j = 0; j < outputSize; j++) {
+                        const neuronWeights = [];
+                        for (let k = 0; k < inputSize; k++) {
+                            neuronWeights.push(0);
+                        }
+                        layerWeights.push(neuronWeights);
+                    }
+                    
+                    this.weights.push(layerWeights);
+                    this.biases.push(Array(outputSize).fill(0));
+                }
+                
+                // Initialize layers with meaningful patterns
+                this.initializeHiddenLayer1Presets();
+                this.initializeOutputLayer();
+            }
+
+            initializeHiddenLayer1Presets() {
+                // Apply preset feature detectors to the 15 neurons in hidden layer 1
+                const presetSequence = [
+                    'top-row', 'mid-row', 'bottom-row', 'left-col', 'mid-col',
+                    'mid-right-col', 'right-col', 'diagonal', 'top-left-curve',
+                    'top-right-curve', 'bottom-left-curve', 'bottom-right-curve',
+                    'mid-left-curves', 'mid-right-curves', 'mid-left-mid-top-dot'
+                ];
+                
+                const presetPatterns = {
+                    'top-row': [
+                        [ 1,  1,  1,  1,  1],
+                        [-1, -1, -1, -1, -1],
+                        [ 0,  0,  0,  0,  0],
+                        [ 0,  0,  0,  0,  0],
+                        [ 0,  0,  0,  0,  0]
+                    ],
+                    'mid-row': [
+                        [ 0,  0,  0,  0,  0],
+                        [-1, -1, -1, -1, -1],
+                        [ 1,  1,  1,  1,  1],
+                        [-1, -1, -1, -1, -1],
+                        [ 0,  0,  0,  0,  0]
+                    ],
+                    'bottom-row': [
+                        [ 0,  0,  0,  0,  0],
+                        [ 0,  0,  0,  0,  0],
+                        [ 0,  0,  0,  0,  0],
+                        [-1, -1, -1, -1, -1],
+                        [ 1,  1,  1,  1,  1]
+                    ],
+                    'left-col': [
+                        [ 1, -1,  0,  0,  0],
+                        [ 1, -1,  0,  0,  0],
+                        [ 1, -1,  0,  0,  0],
+                        [ 1, -1,  0,  0,  0],
+                        [ 1, -1,  0,  0,  0]
+                    ],
+                    'mid-col': [
+                        [ 0, -1,  1, -1,  0],
+                        [ 0, -1,  1, -1,  0],
+                        [ 0, -1,  1, -1,  0],
+                        [ 0, -1,  1, -1,  0],
+                        [ 0, -1,  1, -1,  0]
+                    ],
+                    'mid-right-col': [
+                        [ 0,  0, -1,  1, -1],
+                        [ 0,  0, -1,  1, -1],
+                        [ 0,  0, -1,  1, -1],
+                        [ 0,  0, -1,  1, -1],
+                        [ 0,  0, -1,  1, -1]
+                    ],
+                    'right-col': [
+                        [ 0,  0,  0, -1,  1],
+                        [ 0,  0,  0, -1,  1],
+                        [ 0,  0,  0, -1,  1],
+                        [ 0,  0,  0, -1,  1],
+                        [ 0,  0,  0, -1,  1]
+                    ],
+                    'diagonal': [
+                        [ 0,  0,  0,  0, -1],
+                        [ 0,  0,  0, -1,  1],
+                        [ 0,  0, -1,  1, -1],
+                        [ 0, -1,  1, -1,  0],
+                        [-1,  1, -1,  0,  0]
+                    ],
+                    'top-left-curve': [
+                        [-1,  1,  0,  0,  0],
+                        [ 1, -1,  0,  0,  0],
+                        [ 0,  0,  0,  0,  0],
+                        [ 0,  0,  0,  0,  0],
+                        [ 0,  0,  0,  0,  0]
+                    ],
+                    'top-right-curve': [
+                        [ 0,  0,  0,  1, -1],
+                        [ 0,  0,  0, -1,  1],
+                        [ 0,  0,  0,  0,  0],
+                        [ 0,  0,  0,  0,  0],
+                        [ 0,  0,  0,  0,  0]
+                    ],
+                    'bottom-left-curve': [
+                        [ 0,  0,  0,  0,  0],
+                        [ 0,  0,  0,  0,  0],
+                        [ 0,  0,  0,  0,  0],
+                        [ 1, -1,  0,  0,  0],
+                        [-1,  1,  0,  0,  0]
+                    ],
+                    'bottom-right-curve': [
+                        [ 0,  0,  0,  0,  0],
+                        [ 0,  0,  0,  0,  0],
+                        [ 0,  0,  0,  0,  0],
+                        [ 0,  0,  0, -1,  1],
+                        [ 0,  0,  0,  1, -1]
+                    ],
+                    'mid-left-curves': [
+                        [ 0,  0,  0,  0,  0],
+                        [ 1, -1,  0,  0,  0],
+                        [-1,  1,  0,  0,  0],
+                        [ 1, -1,  0,  0,  0],
+                        [ 0,  0,  0,  0,  0]
+                    ],
+                    'mid-right-curves': [
+                        [ 0,  0,  0,  0,  0],
+                        [ 0,  0,  0, -1,  1],
+                        [ 0,  0,  0,  1, -1],
+                        [ 0,  0,  0, -1,  1],
+                        [ 0,  0,  0,  0,  0]
+                    ],
+                    'mid-left-mid-top-dot': [
+                        [-1, -1,  0,  0,  0],
+                        [-1,  1,  0,  0,  0],
+                        [-1, -1,  0,  0,  0],
+                        [ 0,  0,  0,  0,  0],
+                        [ 0,  0,  0,  0,  0]
+                    ]
+                };
+                
+                // Apply presets to hidden layer 1 (now 15 neurons)
+                for (let neuronIdx = 0; neuronIdx < 15; neuronIdx++) {
+                    const presetType = presetSequence[neuronIdx];
+                    const pattern = presetPatterns[presetType];
+                    
+                    if (pattern) {
+                        let idx = 0;
+                        for (let i = 0; i < 5; i++) {
+                            for (let j = 0; j < 5; j++) {
+                                this.weights[0][neuronIdx][idx] = pattern[i][j];
+                                idx++;
+                            }
+                        }
+                    }
+                }
+                
+                // Biases for the 15 detectors
+                const h1Biases = [
+                    -2.0,  // TopRow
+                    -2.0,  // MidRow
+                    -2.0,  // BottomRow
+                    -2.0,  // LeftCol
+                    -2.0,  // MidCol
+                    -2.0,  // MidRightCol
+                    -2.0,  // RightCol
+                    -2.0,  // Diagonal
+                    -1.0,  // TopLeftCurve
+                    -1.0,  // TopRightCurve
+                    -1.0,  // BottomLeftCurve
+                    -1.0,  // BottomRightCurve
+                    -1.5,  // MidLeftCurve
+                    -1.5,  // MidRightCurve
+                    -1.5   // MidLeftMidTopDot
+                ];
+                
+                for (let i = 0; i < 15; i++) {
+                    this.biases[0][i] = h1Biases[i];
+                }
+            }
+
+            initializeOutputLayer() {
+                // Output layer: each neuron detects a specific digit (0-9)
+                // Now connects directly to H1 (15 neurons)
+                // Order: TopRow, MidRow, BottomRow, LeftCol, MidCol, MidRightCol, RightCol, 
+                //        Diagonal, TopLeftCurve, TopRightCurve, BottomLeftCurve, BottomRightCurve,
+                //        MidLeftCurve, MidRightCurve, MidLeftMidTopDot
+                
+                const outputPatterns = [
+                    // Digit 0: Circle - top, bottom, left, right, all 4 corners
+                    [ 1,  0,  1,  1,  0,  0,  1,  0,  1,  1,  1,  1,  0,  0,  0],
+                    
+                    // Digit 1: Bottom row + mid col + mid-left-mid-top dot
+                    [ 0,  0,  1,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1],
+                    
+                    // Digit 2: Top + diagonal + bottom, curves at corners + top-left curve
+                    [ 1,  0,  1,  0,  0,  0,  0,  1,  1,  1,  1,  0,  0,  0,  0],
+                    
+                    // Digit 3: Right side with horizontal bars + top-right curve + bottom-right curve
+                    [ 1,  1,  1,  0,  0,  0,  1,  0,  0,  1,  0,  1,  0,  1,  0],
+                    
+                    // Digit 4: Mid-row + left-col + mid-right-col
+                    [ 0,  1,  0,  1,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+                    
+                    // Digit 5: Top, mid, bottom rows + left, right cols + top-left curve + bottom-right curve + mid-right curve
+                    [ 1,  1,  1,  1,  0,  0,  1,  0,  1,  0,  0,  1,  0,  1,  0],
+                    
+                    // Digit 6: Left C-shape with middle bar + mid-right curve
+                    [ 1,  1,  1,  1,  0,  0,  0,  0,  1,  0,  1,  1,  0,  1,  0],
+                    
+                    // Digit 7: Top + diagonal
+                    [ 1,  0,  0,  0,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0],
+                    
+                    // Digit 8: Full circle with middle bar - all curves
+                    [ 1,  1,  1,  1,  0,  0,  1,  0,  1,  1,  1,  1,  1,  1,  0],
+                    
+                    // Digit 9: Top row, mid row, bottom row, right col, top-left curve, top-right curve, bottom-right curve
+                    [ 1,  1,  1,  0,  0,  0,  1,  0,  1,  1,  0,  1,  0,  0,  0]
+                ];
+                
+                // Apply to weights[1] (connection from H1 to Output)
+                for (let digitIdx = 0; digitIdx < 10; digitIdx++) {
+                    for (let h1Idx = 0; h1Idx < 15; h1Idx++) {
+                        this.weights[1][digitIdx][h1Idx] = outputPatterns[digitIdx][h1Idx];
+                    }
+                }
+                
+                const outputBiases = [
+                    -3.0,  // Digit 0 - needs many features
+                    -0.5,  // Digit 1 - simple pattern
+                    -2.5,  // Digit 2
+                    -2.5,  // Digit 3
+                    -1.5,  // Digit 4
+                    -2.5,  // Digit 5
+                    -3.0,  // Digit 6
+                    -1.0,  // Digit 7
+                    -4.5,  // Digit 8 - most complex
+                    -2.2   // Digit 9
+                ];
+                
+                for (let i = 0; i < 10; i++) {
+                    this.biases[1][i] = outputBiases[i];
+                }
+            }
+
+            randomizeNetwork() {
+                for (let i = 0; i < this.layers.length - 1; i++) {
+                    const inputSize = this.layers[i];
+                    const outputSize = this.layers[i + 1];
+                    
+                    // Generate random weights in [-1, 1] range
+                    for (let j = 0; j < outputSize; j++) {
+                        for (let k = 0; k < inputSize; k++) {
+                            this.weights[i][j][k] = Math.random() * 2 - 1; // Range: -1 to 1
+                        }
+                    }
+                    
+                    // Randomize biases in [-0.5, 0.5]
+                    for (let j = 0; j < outputSize; j++) {
+                        this.biases[i][j] = (Math.random() * 2 - 1) * 0.5;
+                    }
+                }
+            }
+
+            init() {
+                this.renderInputMatrix();
+                this.renderNetwork();
+                this.forwardPass(); // Run after rendering to update neuron colors
+                this.setupEventListeners();
+                
+                setTimeout(() => {
+                    this.showNeuronDetails(1, 0);
+                }, 150);
+            }
+
+            setupEventListeners() {
+                document.getElementById('clearButton').addEventListener('click', () => {
+                    this.inputData = Array(5).fill(0).map(() => Array(5).fill(0));
+                    this.renderInputMatrix();
+                    this.forwardPass();
+                });
+
+                document.getElementById('randomButton').addEventListener('click', () => {
+                    this.inputData = Array(5).fill(0).map(() => Array(5).fill(0).map(() => Math.random()));
+                    this.renderInputMatrix();
+                    this.forwardPass();
+                });
+
+                document.getElementById('randomizeButton').addEventListener('click', () => {
+                    this.randomizeNetwork();
+                    this.forwardPass();
+                    if (this.selectedLayer !== null) {
+                        this.showNeuronDetails(this.selectedLayer, this.selectedNeuron);
+                    }
+                });
+
+                document.getElementById('clearWeightsButton').addEventListener('click', () => {
+                    this.initializeNetwork();
+                    this.forwardPass();
+                    if (this.selectedLayer !== null) {
+                        this.showNeuronDetails(this.selectedLayer, this.selectedNeuron);
+                    }
+                });
+
+                document.addEventListener('mouseup', () => {
+                    this.isDrawing = false;
+                });
+                
+                document.getElementById('charInput').addEventListener('input', (e) => {
+                    const char = e.target.value;
+                    if (char) {
+                        this.renderCharacter(char);
+                        this.forwardPass();
+                    }
+                });
+                
+                // Keyboard navigation for neurons
+                document.addEventListener('keydown', (e) => {
+                    // Don't intercept if user is typing in an input field
+                    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                        return;
+                    }
+                    
+                    if (this.selectedLayer === null || this.selectedNeuron === null) {
+                        return;
+                    }
+                    
+                    let newLayer = this.selectedLayer;
+                    let newNeuron = this.selectedNeuron;
+                    
+                    switch(e.key) {
+                        case 'ArrowUp':
+                            e.preventDefault();
+                            // Move to previous neuron in same layer
+                            newNeuron = Math.max(0, this.selectedNeuron - 1);
+                            break;
+                        case 'ArrowDown':
+                            e.preventDefault();
+                            // Move to next neuron in same layer
+                            newNeuron = Math.min(this.layers[this.selectedLayer] - 1, this.selectedNeuron + 1);
+                            break;
+                        case 'ArrowLeft':
+                            e.preventDefault();
+                            // Move to previous layer
+                            if (this.selectedLayer > 1) {
+                                newLayer = this.selectedLayer - 1;
+                                // Keep neuron index, but clamp to layer size
+                                newNeuron = Math.min(this.selectedNeuron, this.layers[newLayer] - 1);
+                            }
+                            break;
+                        case 'ArrowRight':
+                            e.preventDefault();
+                            // Move to next layer
+                            if (this.selectedLayer < this.layers.length - 1) {
+                                newLayer = this.selectedLayer + 1;
+                                // Keep neuron index, but clamp to layer size
+                                newNeuron = Math.min(this.selectedNeuron, this.layers[newLayer] - 1);
+                            }
+                            break;
+                    }
+                    
+                    // Update selection if changed
+                    if (newLayer !== this.selectedLayer || newNeuron !== this.selectedNeuron) {
+                        this.showNeuronDetails(newLayer, newNeuron);
+                    }
+                });
+            }
+
+            renderCharacter(char) {
+                const charPatterns = {
+                    'A': [[0,1,1,1,0],[1,0,0,0,1],[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1]],
+                    'B': [[1,1,1,1,0],[1,0,0,0,1],[1,1,1,1,0],[1,0,0,0,1],[1,1,1,1,0]],
+                    'C': [[0,1,1,1,1],[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0],[0,1,1,1,1]],
+                    'D': [[1,1,1,1,0],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,0]],
+                    'E': [[1,1,1,1,1],[1,0,0,0,0],[1,1,1,1,0],[1,0,0,0,0],[1,1,1,1,1]],
+                    'F': [[1,1,1,1,1],[1,0,0,0,0],[1,1,1,1,0],[1,0,0,0,0],[1,0,0,0,0]],
+                    'G': [[0,1,1,1,1],[1,0,0,0,0],[1,0,1,1,1],[1,0,0,0,1],[0,1,1,1,0]],
+                    'H': [[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1]],
+                    'I': [[1,1,1,1,1],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0],[1,1,1,1,1]],
+                    'J': [[0,0,0,1,1],[0,0,0,0,1],[0,0,0,0,1],[1,0,0,0,1],[0,1,1,1,0]],
+                    'K': [[1,0,0,0,1],[1,0,0,1,0],[1,1,1,0,0],[1,0,0,1,0],[1,0,0,0,1]],
+                    'L': [[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,1,1,1,1]],
+                    'M': [[1,0,0,0,1],[1,1,0,1,1],[1,0,1,0,1],[1,0,0,0,1],[1,0,0,0,1]],
+                    'N': [[1,0,0,0,1],[1,1,0,0,1],[1,0,1,0,1],[1,0,0,1,1],[1,0,0,0,1]],
+                    'O': [[0,1,1,1,0],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[0,1,1,1,0]],
+                    'P': [[1,1,1,1,0],[1,0,0,0,1],[1,1,1,1,0],[1,0,0,0,0],[1,0,0,0,0]],
+                    'Q': [[0,1,1,1,0],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,1,0],[0,1,1,0,1]],
+                    'R': [[1,1,1,1,0],[1,0,0,0,1],[1,1,1,1,0],[1,0,0,1,0],[1,0,0,0,1]],
+                    'S': [[0,1,1,1,1],[1,0,0,0,0],[0,1,1,1,0],[0,0,0,0,1],[1,1,1,1,0]],
+                    'T': [[1,1,1,1,1],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0]],
+                    'U': [[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[0,1,1,1,0]],
+                    'V': [[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[0,1,0,1,0],[0,0,1,0,0]],
+                    'W': [[1,0,0,0,1],[1,0,0,0,1],[1,0,1,0,1],[1,1,0,1,1],[1,0,0,0,1]],
+                    'X': [[1,0,0,0,1],[0,1,0,1,0],[0,0,1,0,0],[0,1,0,1,0],[1,0,0,0,1]],
+                    'Y': [[1,0,0,0,1],[0,1,0,1,0],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0]],
+                    'Z': [[1,1,1,1,1],[0,0,0,1,0],[0,0,1,0,0],[0,1,0,0,0],[1,1,1,1,1]],
+                    '0': [[0,1,1,1,0],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[0,1,1,1,0]],
+                    '1': [[0,0,1,0,0],[0,1,1,0,0],[0,0,1,0,0],[0,0,1,0,0],[0,1,1,1,0]],
+                    '2': [[0,1,1,1,0],[1,0,0,0,1],[0,0,0,1,0],[0,0,1,0,0],[1,1,1,1,1]],
+                    '3': [[1,1,1,1,0],[0,0,0,0,1],[0,1,1,1,0],[0,0,0,0,1],[1,1,1,1,0]],
+                    '4': [[1,0,0,1,0],[1,0,0,1,0],[1,1,1,1,1],[0,0,0,1,0],[0,0,0,1,0]],
+                    '5': [[1,1,1,1,1],[1,0,0,0,0],[1,1,1,1,0],[0,0,0,0,1],[1,1,1,1,0]],
+                    '6': [[0,1,1,1,0],[1,0,0,0,0],[1,1,1,1,0],[1,0,0,0,1],[0,1,1,1,0]],
+                    '7': [[1,1,1,1,1],[0,0,0,0,1],[0,0,0,1,0],[0,0,1,0,0],[0,1,0,0,0]],
+                    '8': [[0,1,1,1,0],[1,0,0,0,1],[0,1,1,1,0],[1,0,0,0,1],[0,1,1,1,0]],
+                    '9': [[0,1,1,1,0],[1,0,0,0,1],[0,1,1,1,1],[0,0,0,0,1],[0,1,1,1,0]]
+                };
+
+                const pattern = charPatterns[char.toUpperCase()];
+                
+                if (!pattern) {
+                    alert('Character "' + char + '" is not available.');
+                    return;
+                }
+
+                this.inputData = pattern.map(row => row.map(val => val));
+                
+                this.renderInputMatrix();
+                this.forwardPass();
+            }
+
+            renderInputMatrix() {
+                const container = document.getElementById('inputMatrix');
+                container.innerHTML = '';
+
+                this.inputData.forEach((row, i) => {
+                    row.forEach((val, j) => {
+                        const cell = document.createElement('div');
+                        cell.className = 'input-cell';
+                        this.updateInputCellDisplay(cell, val);
+
+                        let holdTimeout = null;
+
+                        cell.addEventListener('mousedown', (e) => {
+                            e.preventDefault();
+                            this.isDrawing = true;
+                            const isRightClick = e.button === 2;
+                            
+                            if (isRightClick) {
+                                this.inputData[i][j] = Math.max(0, this.inputData[i][j] - 0.1);
+                            } else {
+                                this.inputData[i][j] = Math.min(1, this.inputData[i][j] + 0.1);
+                            }
+                            
+                            this.updateInputCellDisplay(cell, this.inputData[i][j]);
+                            this.forwardPass();
+
+                            holdTimeout = setTimeout(() => {
+                                if (isRightClick) {
+                                    this.inputData[i][j] = 0;
+                                } else {
+                                    this.inputData[i][j] = 1;
+                                }
+                                this.updateInputCellDisplay(cell, this.inputData[i][j]);
+                                this.forwardPass();
+                            }, 500);
+                        });
+
+                        cell.addEventListener('mouseenter', () => {
+                            if (this.isDrawing) {
+                                this.inputData[i][j] = Math.min(1, this.inputData[i][j] + 0.1);
+                                this.updateInputCellDisplay(cell, this.inputData[i][j]);
+                                this.forwardPass();
+                            }
+                        });
+
+                        cell.addEventListener('mouseup', () => {
+                            this.isDrawing = false;
+                            if (holdTimeout) {
+                                clearTimeout(holdTimeout);
+                                holdTimeout = null;
+                            }
+                        });
+
+                        cell.addEventListener('mouseleave', () => {
+                            if (holdTimeout) {
+                                clearTimeout(holdTimeout);
+                                holdTimeout = null;
+                            }
+                        });
+
+                        cell.addEventListener('contextmenu', (e) => {
+                            e.preventDefault();
+                        });
+
+                        container.appendChild(cell);
+                    });
+                });
+            }
+
+            updateInputCellDisplay(cell, val) {
+                const intensity = Math.round(val * 255);
+                cell.style.backgroundColor = `rgb(${255 - intensity}, ${255 - intensity}, ${255 - intensity})`;
+                cell.style.color = val > 0.5 ? '#fff' : '#000';
+            }
+
+            renderNetwork() {
+                const container = document.getElementById('networkContainer');
+                container.innerHTML = '';
+
+                const layerElements = [];
+
+                for (let l = 0; l < this.layers.length; l++) {
+                    const layerDiv = document.createElement('div');
+                    layerDiv.className = 'layer';
+                    
+                    const label = document.createElement('div');
+                    label.className = 'layer-label';
+                    if (l === 0) label.textContent = 'Input (25)';
+                    else if (l === this.layers.length - 1) label.textContent = 'Output (10)';
+                    else label.textContent = `Hidden (15)`;
+                    layerDiv.appendChild(label);
+
+                    const neuronsDiv = document.createElement('div');
+                    neuronsDiv.className = 'neurons';
+
+                    for (let n = 0; n < this.layers[l]; n++) {
+                        const neuron = document.createElement('div');
+                        neuron.className = 'neuron';
+                        neuron.dataset.layer = l;
+                        neuron.dataset.neuron = n;
+
+                        if (l > 0) {
+                            neuron.addEventListener('click', () => {
+                                this.showNeuronDetails(l, n);
+                            });
+                        }
+
+                        neuronsDiv.appendChild(neuron);
+                        
+                        // Add activation value label for output layer
+                        if (l === this.layers.length - 1) {
+                            const activationLabel = document.createElement('div');
+                            activationLabel.style.fontSize = '0.7rem';
+                            activationLabel.style.color = 'var(--text-secondary)';
+                            activationLabel.style.marginLeft = '0.5rem';
+                            activationLabel.style.minWidth = '3rem';
+                            activationLabel.dataset.layer = l;
+                            activationLabel.dataset.neuron = n;
+                            activationLabel.className = 'activation-label';
+                            activationLabel.textContent = '0.00';
+                            
+                            const neuronRow = document.createElement('div');
+                            neuronRow.style.display = 'flex';
+                            neuronRow.style.alignItems = 'center';
+                            neuronRow.style.gap = '0.3rem';
+                            
+                            neuronsDiv.removeChild(neuron);
+                            neuronRow.appendChild(neuron);
+                            neuronRow.appendChild(activationLabel);
+                            neuronsDiv.appendChild(neuronRow);
+                        }
+                    }
+                    
+                    // Add "add neuron" button for hidden and output layers
+                    if (l === 1 || l === this.layers.length - 1) {
+                        const addButton = document.createElement('div');
+                        addButton.className = 'add-neuron-button';
+                        addButton.textContent = '+';
+                        addButton.title = l === 1 ? 'Add Hidden Neuron' : 'Add Output Neuron';
+                        addButton.addEventListener('click', () => {
+                            this.addNeuron(l);
+                        });
+                        
+                        // For output layer, wrap in row like other neurons
+                        if (l === this.layers.length - 1) {
+                            const buttonRow = document.createElement('div');
+                            buttonRow.style.display = 'flex';
+                            buttonRow.style.alignItems = 'center';
+                            buttonRow.style.gap = '0.3rem';
+                            buttonRow.appendChild(addButton);
+                            neuronsDiv.appendChild(buttonRow);
+                        } else {
+                            neuronsDiv.appendChild(addButton);
+                        }
+                    }
+
+                    layerDiv.appendChild(neuronsDiv);
+                    container.appendChild(layerDiv);
+                    layerElements.push(neuronsDiv);
+                }
+
+                this.layerElements = layerElements;
+                
+                if (this.drawTimeout) {
+                    clearTimeout(this.drawTimeout);
+                }
+                this.drawTimeout = setTimeout(() => {
+                    this.drawWeights();
+                    this.drawTimeout = null;
+                }, 100);
+            }
+
+            forwardPass() {
+                const input = this.inputData.flat();
+                this.activations = [input];
+
+                let currentActivation = input;
+
+                for (let l = 0; l < this.weights.length; l++) {
+                    const nextActivation = [];
+                    
+                    for (let n = 0; n < this.weights[l].length; n++) {
+                        let sum = this.biases[l][n];
+                        
+                        if (!this.weights[l][n]) {
+                            console.error(`Missing weights for layer ${l}, neuron ${n}`);
+                            nextActivation.push(0);
+                            continue;
+                        }
+                        
+                        for (let i = 0; i < currentActivation.length; i++) {
+                            if (this.weights[l][n][i] !== undefined) {
+                                sum += currentActivation[i] * this.weights[l][n][i];
+                            }
+                        }
+                        
+                        // Apply sigmoid to all layers
+                        nextActivation.push(1 / (1 + Math.exp(-sum)));
+                    }
+                    
+                    this.activations.push(nextActivation);
+                    currentActivation = nextActivation;
+                }
+
+                this.updateNeuronColors();
+                this.updatePrediction();
+                
+                if (this.drawTimeout) {
+                    clearTimeout(this.drawTimeout);
+                }
+                this.drawTimeout = setTimeout(() => {
+                    this.drawWeights();
+                    this.drawTimeout = null;
+                }, 50);
+                
+                if (this.selectedLayer !== null && this.selectedNeuron !== null && !this.isEditingWeights) {
+                    this.showNeuronDetails(this.selectedLayer, this.selectedNeuron);
+                }
+            }
+            
+            updatePrediction() {
+                const outputActivations = this.activations[this.activations.length - 1];
+                if (!outputActivations) return;
+                
+                const maxIndex = outputActivations.indexOf(Math.max(...outputActivations));
+                const maxValue = outputActivations[maxIndex];
+                
+                const predictionElement = document.getElementById('predictionDisplay');
+                if (predictionElement) {
+                    predictionElement.textContent = `Predicted: ${maxIndex} (${(maxValue * 100).toFixed(1)}%)`;
+                }
+            }
+
+            updateNeuronColors() {
+                if (!this.layerElements) return;
+                if (!this.activations) return;
+
+                for (let l = 0; l < this.layers.length; l++) {
+                    const neurons = this.layerElements[l].children;
+                    
+                    if (!this.activations[l]) continue;
+                    
+                    for (let n = 0; n < neurons.length; n++) {
+                        const activation = this.activations[l][n];
+                        
+                        if (activation === undefined) continue;
+                        
+                        // For output layer, neurons are wrapped in a row div
+                        let neuronElement;
+                        if (l === this.layers.length - 1) {
+                            neuronElement = neurons[n].querySelector('.neuron');
+                        } else {
+                            neuronElement = neurons[n];
+                        }
+                        
+                        if (neuronElement) {
+                            const intensity = Math.round(activation * 255);
+                            neuronElement.style.backgroundColor = `rgb(${255 - intensity}, ${255 - intensity}, ${255 - intensity})`;
+                        }
+                        
+                        // Update activation label for output layer
+                        if (l === this.layers.length - 1) {
+                            const label = neurons[n].querySelector('.activation-label');
+                            if (label) {
+                                label.textContent = activation.toFixed(2);
+                            }
+                        }
+                    }
+                }
+            }
+
+            drawWeights() {
+                const svg = document.getElementById('weightsSvg');
+                const container = document.getElementById('networkContainer');
+                
+                if (!svg || !container) {
+                    console.error('SVG or container not found');
+                    return;
+                }
+                
+                svg.innerHTML = '';
+                
+                if (!this.layerElements) {
+                    console.error('Layer elements not found');
+                    return;
+                }
+
+                const svgRect = svg.getBoundingClientRect();
+
+                for (let l = 0; l < this.layers.length - 1; l++) {
+                    const fromNeurons = this.layerElements[l].children;
+                    const toNeurons = this.layerElements[l + 1].children;
+
+                    if (!fromNeurons || !toNeurons) continue;
+
+                    for (let from = 0; from < fromNeurons.length; from++) {
+                        // Get the actual neuron element (not wrapper)
+                        let fromNeuronElement;
+                        if (l === this.layers.length - 2) {
+                            // Previous layer might be wrapped for output layer
+                            fromNeuronElement = fromNeurons[from].classList?.contains('neuron') 
+                                ? fromNeurons[from] 
+                                : fromNeurons[from].querySelector('.neuron') || fromNeurons[from];
+                        } else {
+                            fromNeuronElement = fromNeurons[from];
+                        }
+                        
+                        const fromRect = fromNeuronElement.getBoundingClientRect();
+                        const fromX = fromRect.left + fromRect.width / 2 - svgRect.left;
+                        const fromY = fromRect.top + fromRect.height / 2 - svgRect.top;
+
+                        for (let to = 0; to < toNeurons.length; to++) {
+                            // Get the actual neuron element (not wrapper)
+                            let toNeuronElement;
+                            if (l + 1 === this.layers.length - 1) {
+                                // Output layer - neurons are wrapped in row divs
+                                toNeuronElement = toNeurons[to].querySelector('.neuron');
+                            } else {
+                                toNeuronElement = toNeurons[to];
+                            }
+                            
+                            if (!toNeuronElement) continue;
+                            
+                            const toRect = toNeuronElement.getBoundingClientRect();
+                            const toX = toRect.left + toRect.width / 2 - svgRect.left;
+                            const toY = toRect.top + toRect.height / 2 - svgRect.top;
+
+                            if (!this.weights[l] || !this.weights[l][to] || this.weights[l][to][from] === undefined) {
+                                continue;
+                            }
+
+                            const weight = this.weights[l][to][from];
+                            const color = this.getWeightColor(weight);
+                            const lineWidth = Math.abs(weight) * 2 + 0.5;
+
+                            let opacity = 0.5;
+                            
+                            if (this.selectedLayer !== null && this.selectedNeuron !== null) {
+                                const isIncoming = (l + 1 === this.selectedLayer && to === this.selectedNeuron);
+                                const isOutgoing = (l === this.selectedLayer && from === this.selectedNeuron);
+                                
+                                if (isIncoming || isOutgoing) {
+                                    opacity = 1.0;
+                                } else {
+                                    opacity = 0.1;
+                                }
+                            }
+
+                            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                            line.setAttribute('x1', fromX);
+                            line.setAttribute('y1', fromY);
+                            line.setAttribute('x2', toX);
+                            line.setAttribute('y2', toY);
+                            line.setAttribute('stroke', color);
+                            line.setAttribute('stroke-width', lineWidth);
+                            line.setAttribute('opacity', opacity);
+                            
+                            svg.appendChild(line);
+                        }
+                    }
+                }
+            }
+
+            getWeightColor(weight) {
+                const clampedWeight = Math.max(-1, Math.min(1, weight));
+                
+                let r, g, b;
+                
+                if (clampedWeight < 0) {
+                    const t = Math.abs(clampedWeight);
+                    r = Math.round(255 - t * (255 - 103));
+                    g = Math.round(255 - t * (255 - 0));
+                    b = Math.round(255 - t * (255 - 31));
+                } else if (clampedWeight > 0) {
+                    const t = clampedWeight;
+                    r = Math.round(255 - t * (255 - 0));
+                    g = Math.round(255 - t * (255 - 100));
+                    b = Math.round(255 - t * (255 - 0));
+                } else {
+                    r = 255;
+                    g = 255;
+                    b = 255;
+                }
+                
+                return `rgb(${r}, ${g}, ${b})`;
+            }
+
+            detectPresetName(weights) {
+                if (weights.length !== 25) return 'Custom';
+                
+                const presetPatterns = {
+                    '═ Top Row': [[1,1,1,1,1],[-1,-1,-1,-1,-1],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]],
+                    '═ Mid Row': [[0,0,0,0,0],[-1,-1,-1,-1,-1],[1,1,1,1,1],[-1,-1,-1,-1,-1],[0,0,0,0,0]],
+                    '═ Bottom Row': [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[-1,-1,-1,-1,-1],[1,1,1,1,1]],
+                    '║ Left Col': [[1,-1,0,0,0],[1,-1,0,0,0],[1,-1,0,0,0],[1,-1,0,0,0],[1,-1,0,0,0]],
+                    '║ Mid Col': [[0,-1,1,-1,0],[0,-1,1,-1,0],[0,-1,1,-1,0],[0,-1,1,-1,0],[0,-1,1,-1,0]],
+                    '║ Mid-Right Col': [[0,0,-1,1,-1],[0,0,-1,1,-1],[0,0,-1,1,-1],[0,0,-1,1,-1],[0,0,-1,1,-1]],
+                    '║ Right Col': [[0,0,0,-1,1],[0,0,0,-1,1],[0,0,0,-1,1],[0,0,0,-1,1],[0,0,0,-1,1]],
+                    '⟋ Diagonal': [[0,0,0,0,-1],[0,0,0,-1,1],[0,0,-1,1,-1],[0,-1,1,-1,0],[-1,1,-1,0,0]],
+                    '╔ Top-Left Curve': [[-1,1,0,0,0],[1,-1,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]],
+                    '╗ Top-Right Curve': [[0,0,0,1,-1],[0,0,0,-1,1],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]],
+                    '╚ Bottom-Left Curve': [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[1,-1,0,0,0],[-1,1,0,0,0]],
+                    '╝ Bottom-Right Curve': [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,-1,1],[0,0,0,1,-1]],
+                    '╠ Mid-Left Curves': [[0,0,0,0,0],[1,-1,0,0,0],[-1,1,0,0,0],[1,-1,0,0,0],[0,0,0,0,0]],
+                    '╣ Mid-Right Curves': [[0,0,0,0,0],[0,0,0,-1,1],[0,0,0,1,-1],[0,0,0,-1,1],[0,0,0,0,0]],
+                    '• Mid-Left-Top Dot': [[-1,-1,0,0,0],[-1,1,0,0,0],[-1,-1,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
+                };
+                
+                for (const [name, pattern] of Object.entries(presetPatterns)) {
+                    let matches = true;
+                    let idx = 0;
+                    for (let i = 0; i < 5; i++) {
+                        for (let j = 0; j < 5; j++) {
+                            if (Math.abs(weights[idx] - pattern[i][j]) > 0.01) {
+                                matches = false;
+                                break;
+                            }
+                            idx++;
+                        }
+                        if (!matches) break;
+                    }
+                    if (matches) return name;
+                }
+                
+                return 'Custom';
+            }
+
+            showNeuronDetails(layer, neuron) {
+                if (layer <= 0 || layer >= this.layers.length) {
+                    return;
+                }
+                
+                if (neuron < 0 || neuron >= this.layers[layer]) {
+                    return;
+                }
+
+                if (!this.activations || this.activations.length <= layer - 1) {
+                    return;
+                }
+
+                this.selectedLayer = layer;
+                this.selectedNeuron = neuron;
+
+                this.drawWeights();
+
+                document.querySelectorAll('.neuron').forEach(n => n.classList.remove('selected'));
+                const selectedNeuronElement = document.querySelector(`.neuron[data-layer="${layer}"][data-neuron="${neuron}"]`);
+                if (selectedNeuronElement) {
+                    selectedNeuronElement.classList.add('selected');
+                }
+
+                const container = document.getElementById('detailsContent');
+                container.innerHTML = '';
+                
+                // Always get fresh activations and weights
+                const prevActivations = this.activations[layer - 1];
+                const weights = this.weights[layer - 1][neuron];
+                const bias = this.biases[layer - 1][neuron];
+                
+                // Safety check: ensure we have valid data
+                if (!prevActivations || !weights) {
+                    console.error('Missing activation or weight data');
+                    return;
+                }
+                
+                const detailsLabel = document.getElementById('neuronDetailsLabel');
+                
+                let labelText = 'Neuron Details';
+                
+                if (layer === 1) {
+                    const presetName = this.detectPresetName(weights);
+                    labelText += `: ${presetName}`;
+                } else if (layer === 2) {
+                    labelText += `: Digit ${neuron}`;
+                }
+                
+                detailsLabel.textContent = labelText;
+
+                const leftColumn = document.createElement('div');
+                leftColumn.className = 'column';
+
+                const inputDiv = document.createElement('div');
+                const inputLabel = document.createElement('div');
+                inputLabel.className = 'matrix-label';
+                inputLabel.textContent = 'Weighted Input (Input × Influence)';
+                inputDiv.appendChild(inputLabel);
+
+                const showInputCheckbox = document.createElement('label');
+                showInputCheckbox.style.display = 'flex';
+                showInputCheckbox.style.alignItems = 'center';
+                showInputCheckbox.style.gap = '0.5rem';
+                showInputCheckbox.style.cursor = 'pointer';
+                showInputCheckbox.style.fontSize = '0.85rem';
+                showInputCheckbox.style.marginBottom = '0.5rem';
+
+                const inputCheckbox = document.createElement('input');
+                inputCheckbox.type = 'checkbox';
+                inputCheckbox.checked = this.showInputInInfluence;
+                inputCheckbox.style.width = '16px';
+                inputCheckbox.style.height = '16px';
+                inputCheckbox.style.cursor = 'pointer';
+                
+                inputCheckbox.addEventListener('change', (e) => {
+                    this.showInputInInfluence = e.target.checked;
+                    this.showNeuronDetails(layer, neuron);
+                });
+
+                showInputCheckbox.appendChild(inputCheckbox);
+                const inputCheckboxLabel = document.createElement('span');
+                inputCheckboxLabel.textContent = 'Show Weighted Contributions';
+                showInputCheckbox.appendChild(inputCheckboxLabel);
+                inputDiv.appendChild(showInputCheckbox);
+
+                const inputMatrix = this.createInputInfluenceMatrix(layer, neuron);
+                inputDiv.appendChild(inputMatrix);
+                leftColumn.appendChild(inputDiv);
+
+                container.appendChild(leftColumn);
+
+                const weightsColumn = document.createElement('div');
+                weightsColumn.className = 'column';
+
+                const weightsDiv = document.createElement('div');
+                
+                if (layer === 1) {
+                    const presetName = this.detectPresetName(weights);
+                    
+                    const presetContainer = document.createElement('div');
+                    presetContainer.style.marginBottom = '0.75rem';
+                    presetContainer.style.display = 'flex';
+                    presetContainer.style.gap = '0.5rem';
+                    presetContainer.style.alignItems = 'center';
+                    
+                    const presetLabel = document.createElement('label');
+                    presetLabel.style.fontSize = '0.85rem';
+                    presetLabel.textContent = 'Preset:';
+                    presetContainer.appendChild(presetLabel);
+                    
+                    const presetSelect = document.createElement('select');
+                    presetSelect.style.padding = '0.5rem';
+                    presetSelect.style.borderRadius = '6px';
+                    presetSelect.style.border = '1px solid var(--grid-border)';
+                    presetSelect.style.fontSize = '0.85rem';
+                    presetSelect.style.flex = '1';
+                    
+                    const presets = [
+                        { name: 'Custom', value: 'custom' },
+                        { name: '═ Top Row', value: 'top-row' },
+                        { name: '═ Mid Row', value: 'mid-row' },
+                        { name: '═ Bottom Row', value: 'bottom-row' },
+                        { name: '║ Left Col', value: 'left-col' },
+                        { name: '║ Mid Col', value: 'mid-col' },
+                        { name: '║ Mid-Right Col', value: 'mid-right-col' },
+                        { name: '║ Right Col', value: 'right-col' },
+                        { name: '⟋ Diagonal', value: 'diagonal' },
+                        { name: '╔ Top-Left Curve', value: 'top-left-curve' },
+                        { name: '╗ Top-Right Curve', value: 'top-right-curve' },
+                        { name: '╚ Bottom-Left Curve', value: 'bottom-left-curve' },
+                        { name: '╝ Bottom-Right Curve', value: 'bottom-right-curve' },
+                        { name: '╠ Mid-Left Curves', value: 'mid-left-curves' },
+                        { name: '╣ Mid-Right Curves', value: 'mid-right-curves' },
+                        { name: '• Mid-Left-Top Dot', value: 'mid-left-mid-top-dot' }
+                    ];
+                    
+                    const presetNameToValue = {
+                        '═ Top Row': 'top-row',
+                        '═ Mid Row': 'mid-row',
+                        '═ Bottom Row': 'bottom-row',
+                        '║ Left Col': 'left-col',
+                        '║ Mid Col': 'mid-col',
+                        '║ Mid-Right Col': 'mid-right-col',
+                        '║ Right Col': 'right-col',
+                        '⟋ Diagonal': 'diagonal',
+                        '╔ Top-Left Curve': 'top-left-curve',
+                        '╗ Top-Right Curve': 'top-right-curve',
+                        '╚ Bottom-Left Curve': 'bottom-left-curve',
+                        '╝ Bottom-Right Curve': 'bottom-right-curve',
+                        '╠ Mid-Left Curves': 'mid-left-curves',
+                        '╣ Mid-Right Curves': 'mid-right-curves',
+                        '• Mid-Left-Top Dot': 'mid-left-mid-top-dot',
+                        'Custom': 'custom'
+                    };
+                    
+                    presets.forEach(preset => {
+                        const option = document.createElement('option');
+                        option.value = preset.value || '';
+                        option.textContent = preset.name;
+                        presetSelect.appendChild(option);
+                    });
+                    
+                    const currentPresetValue = presetNameToValue[presetName] || 'custom';
+                    presetSelect.value = currentPresetValue;
+                    
+                    presetSelect.addEventListener('change', (e) => {
+                        const presetType = e.target.value;
+                        if (presetType && presetType !== 'custom') {
+                            this.applyWeightPreset(layer, neuron, presetType);
+                        }
+                    });
+                    
+                    presetContainer.appendChild(presetSelect);
+                    weightsDiv.appendChild(presetContainer);
+                    
+                    const weightComponent = this.createEditableWeightComponent(weights, layer, neuron);
+                    weightsDiv.appendChild(weightComponent);
+                    
+                } else if (layer === 2) {
+                    // Output layer: show H1 neuron titles
+                    const h1PresetNames = [];
+                    for (let i = 0; i < 15; i++) {
+                        const h1Weights = this.weights[0][i];
+                        const presetName = this.detectPresetName(h1Weights);
+                        h1PresetNames.push(presetName);
+                    }
+                    
+                    const circlesContainer = document.createElement('div');
+                    circlesContainer.style.display = 'flex';
+                    circlesContainer.style.flexDirection = 'column';
+                    circlesContainer.style.gap = '8px';
+                    
+                    for (let i = 0; i < 15; i++) {
+                        const row = document.createElement('div');
+                        row.style.display = 'flex';
+                        row.style.alignItems = 'center';
+                        row.style.gap = '1rem';
+                        
+                        const circle = document.createElement('div');
+                        circle.style.width = '30px';
+                        circle.style.height = '30px';
+                        circle.style.borderRadius = '50%';
+                        circle.style.display = 'flex';
+                        circle.style.alignItems = 'center';
+                        circle.style.justifyContent = 'center';
+                        circle.style.fontSize = '0.7rem';
+                        circle.style.fontWeight = '500';
+                        circle.style.cursor = 'pointer';
+                        circle.style.userSelect = 'none';
+                        circle.style.transition = 'transform 0.1s ease';
+                        circle.style.border = '2px solid var(--grid-border)';
+                        
+                        this.updateWeightCircleDisplay(circle, weights[i]);
+                        
+                        circle.holdTimeout = null;
+                        
+                        circle.addEventListener('mousedown', (e) => {
+                            e.preventDefault();
+                            const isRightClick = e.button === 2;
+                            this.isEditingWeights = true;
+                            
+                            if (isRightClick) {
+                                weights[i] = Math.max(-1, weights[i] - 0.1);
+                            } else {
+                                weights[i] = Math.min(1, weights[i] + 0.1);
+                            }
+                            
+                            this.updateWeightCircleDisplay(circle, weights[i]);
+                            this.forwardPass();
+                            
+                            circle.holdTimeout = setTimeout(() => {
+                                if (isRightClick) {
+                                    weights[i] = -1;
+                                } else {
+                                    weights[i] = 1;
+                                }
+                                this.updateWeightCircleDisplay(circle, weights[i]);
+                                this.forwardPass();
+                            }, 500);
+                        });
+                        
+                        circle.addEventListener('mouseup', () => {
+                            if (circle.holdTimeout) {
+                                clearTimeout(circle.holdTimeout);
+                                circle.holdTimeout = null;
+                            }
+                            this.isEditingWeights = false;
+                            this.forwardPass();
+                            this.showNeuronDetails(this.selectedLayer, this.selectedNeuron);
+                        });
+                        
+                        circle.addEventListener('mouseleave', () => {
+                            if (circle.holdTimeout) {
+                                clearTimeout(circle.holdTimeout);
+                                circle.holdTimeout = null;
+                            }
+                        });
+                        
+                        circle.addEventListener('contextmenu', (e) => e.preventDefault());
+                        circle.addEventListener('mouseenter', () => {
+                            circle.style.transform = 'scale(1.1)';
+                        });
+                        circle.addEventListener('mouseleave', () => {
+                            circle.style.transform = 'scale(1)';
+                        });
+                        
+                        row.appendChild(circle);
+                        
+                        const titleDiv = document.createElement('div');
+                        titleDiv.style.fontSize = '0.85rem';
+                        titleDiv.style.fontWeight = '500';
+                        titleDiv.style.color = 'var(--text-primary)';
+                        // Add H1 activation value in parentheses
+                        const h1Activation = this.activations[1][i];
+                        titleDiv.textContent = `${h1PresetNames[i]} (${h1Activation.toFixed(2)})`;
+                        row.appendChild(titleDiv);
+                        
+                        circlesContainer.appendChild(row);
+                    }
+                    
+                    weightsDiv.appendChild(circlesContainer);
+                }
+
+                weightsColumn.appendChild(weightsDiv);
+                container.appendChild(weightsColumn);
+
+                const rightColumn = document.createElement('div');
+                rightColumn.className = 'column';
+
+                const biasDiv = document.createElement('div');
+                biasDiv.className = 'bias-section';
+                
+                const biasLabel = document.createElement('div');
+                biasLabel.className = 'bias-label';
+                biasLabel.textContent = 'Bias';
+                biasDiv.appendChild(biasLabel);
+
+                const biasInput = document.createElement('input');
+                biasInput.type = 'number';
+                biasInput.step = '0.1';
+                biasInput.value = bias.toFixed(2);
+                biasInput.className = 'bias-input';
+                biasInput.addEventListener('change', (e) => {
+                    this.biases[layer - 1][neuron] = parseFloat(e.target.value);
+                    this.forwardPass();
+                });
+                biasDiv.appendChild(biasInput);
+
+                rightColumn.appendChild(biasDiv);
+
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'bias-section';
+                resultDiv.style.marginTop = '1rem';
+                
+                const resultLabel = document.createElement('div');
+                resultLabel.className = 'bias-label';
+                resultLabel.textContent = 'Result';
+                resultDiv.appendChild(resultLabel);
+
+                let rawResult = bias;
+                for (let i = 0; i < prevActivations.length; i++) {
+                    rawResult += prevActivations[i] * weights[i];
+                }
+
+                const resultValue = document.createElement('div');
+                resultValue.style.fontSize = '1.2rem';
+                resultValue.style.fontWeight = '600';
+                resultValue.style.padding = '0.5rem';
+                resultValue.style.background = 'var(--bg-primary)';
+                resultValue.style.borderRadius = '6px';
+                resultValue.style.marginBottom = '0.5rem';
+                resultValue.textContent = rawResult.toFixed(4);
+                resultDiv.appendChild(resultValue);
+
+                const sigmoidCheckbox = document.createElement('label');
+                sigmoidCheckbox.style.display = 'flex';
+                sigmoidCheckbox.style.alignItems = 'center';
+                sigmoidCheckbox.style.gap = '0.5rem';
+                sigmoidCheckbox.style.cursor = 'pointer';
+                sigmoidCheckbox.style.fontSize = '0.9rem';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = true;
+                checkbox.style.width = '18px';
+                checkbox.style.height = '18px';
+                checkbox.style.cursor = 'pointer';
+                
+                checkbox.addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        const sigmoidResult = 1 / (1 + Math.exp(-rawResult));
+                        resultValue.textContent = sigmoidResult.toFixed(4);
+                    } else {
+                        resultValue.textContent = rawResult.toFixed(4);
+                    }
+                });
+
+                sigmoidCheckbox.appendChild(checkbox);
+                const checkboxLabel = document.createElement('span');
+                checkboxLabel.textContent = 'Apply Sigmoid';
+                sigmoidCheckbox.appendChild(checkboxLabel);
+                resultDiv.appendChild(sigmoidCheckbox);
+
+                const sigmoidResult = 1 / (1 + Math.exp(-rawResult));
+                resultValue.textContent = sigmoidResult.toFixed(4);
+
+                rightColumn.appendChild(resultDiv);
+                container.appendChild(rightColumn);
+            }
+
+            calculateInputInfluence(targetLayer, targetNeuron) {
+                const influences = new Array(25).fill(0);
+                
+                if (targetLayer === 1) {
+                    for (let i = 0; i < 25; i++) {
+                        influences[i] = this.weights[0][targetNeuron][i];
+                    }
+                } else if (targetLayer === 2) {
+                    // Output layer: input → hidden1 → output
+                    for (let inputIdx = 0; inputIdx < 25; inputIdx++) {
+                        let totalInfluence = 0;
+                        
+                        for (let h1 = 0; h1 < this.layers[1]; h1++) {
+                            const w1 = this.weights[0][h1][inputIdx];
+                            const a1 = this.activations[1][h1];
+                            const w2 = this.weights[1][targetNeuron][h1];
+                            
+                            const w2_clamped = Math.abs(w2) < 1e-10 ? 0 : w2;
+                            
+                            totalInfluence += w1 * a1 * w2_clamped;
+                        }
+                        
+                        influences[inputIdx] = Math.abs(totalInfluence) < 1e-10 ? 0 : totalInfluence;
+                    }
+                }
+                
+                return influences;
+            }
+
+            createInputInfluenceMatrix(targetLayer, targetNeuron) {
+                const matrix = document.createElement('div');
+                matrix.className = 'activation-matrix';
+                matrix.style.gridTemplateColumns = `repeat(5, 35px)`;
+                
+                const inputActivations = this.inputData.flat();
+                const influences = this.calculateInputInfluence(targetLayer, targetNeuron);
+                const maxAbsInfluence = Math.max(...influences.map(Math.abs));
+                
+                for (let i = 0; i < 25; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'activation-cell';
+                    
+                    const influence = influences[i];
+                    const inputValue = inputActivations[i];
+                    const weightedContribution = inputValue * influence;
+                    
+                    if (this.showInputInInfluence) {
+                        // Show weighted contribution values with original input background color
+                        const intensity = Math.round(inputValue * 255);
+                        cell.style.backgroundColor = `rgb(${255 - intensity}, ${255 - intensity}, ${255 - intensity})`;
+                        cell.style.color = inputValue > 0.5 ? '#fff' : '#000';
+                        cell.textContent = weightedContribution.toFixed(2);
+                    } else {
+                        cell.style.backgroundColor = '#f3f4f6';
+                        cell.style.color = '#6b7280';
+                        cell.textContent = '';
+                    }
+                    
+                    let normalizedInfluence = maxAbsInfluence > 0 ? influence / maxAbsInfluence : 0;
+                    normalizedInfluence = normalizedInfluence === 0 ? 0 : normalizedInfluence;
+                    
+                    let borderColor;
+                    if (normalizedInfluence < 0) {
+                        const intensity = Math.abs(normalizedInfluence);
+                        borderColor = `rgba(103, 0, 31, ${intensity * 0.8 + 0.2})`;
+                    } else if (normalizedInfluence > 0) {
+                        const intensity = normalizedInfluence;
+                        borderColor = `rgba(0, 100, 0, ${intensity * 0.8 + 0.2})`;
+                    } else {
+                        borderColor = 'rgba(156, 163, 175, 0.3)';
+                    }
+                    
+                    cell.style.boxShadow = `0 0 0 3px ${borderColor}`;
+                    cell.style.border = `2px solid ${borderColor}`;
+                    
+                    matrix.appendChild(cell);
+                }
+                
+                return matrix;
+            }
+
+            updateWeightCellDisplay(element, weight) {
+                const displayWeight = weight === 0 ? 0 : weight;
+                element.style.backgroundColor = this.getWeightColor(displayWeight);
+                element.style.color = Math.abs(displayWeight) > 0.4 ? '#fff' : '#000';
+                element.textContent = displayWeight.toFixed(2);
+            }
+
+            createEditableWeightComponent(weights, layer, neuron) {
+                const container = document.createElement('div');
+                
+                if (layer === 1) {
+                    container.className = 'weight-matrix';
+                    container.style.gridTemplateColumns = `repeat(5, 35px)`;
+                    container.style.gap = '2px';
+                    container.style.background = 'var(--grid-border)';
+                    container.style.padding = '2px';
+                    container.style.borderRadius = '4px';
+                    
+                    for (let i = 0; i < 25; i++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'weight-cell';
+                        cell.style.width = '35px';
+                        cell.style.height = '35px';
+                        cell.style.display = 'flex';
+                        cell.style.alignItems = 'center';
+                        cell.style.justifyContent = 'center';
+                        cell.style.fontSize = '0.75rem';
+                        cell.style.fontWeight = '500';
+                        cell.style.borderRadius = '3px';
+                        cell.style.cursor = 'pointer';
+                        cell.style.userSelect = 'none';
+                        
+                        this.updateWeightCellDisplay(cell, weights[i]);
+                        
+                        let holdTimeout = null;
+                        
+                        cell.addEventListener('mousedown', (e) => {
+                            e.preventDefault();
+                            this.isEditingWeights = true;
+                            const isRightClick = e.button === 2;
+                            
+                            if (isRightClick) {
+                                weights[i] = Math.max(-1, weights[i] - 0.1);
+                            } else {
+                                weights[i] = Math.min(1, weights[i] + 0.1);
+                            }
+                            
+                            this.updateWeightCellDisplay(cell, weights[i]);
+                            this.forwardPass();
+                            
+                            holdTimeout = setTimeout(() => {
+                                if (isRightClick) {
+                                    weights[i] = -1;
+                                } else {
+                                    weights[i] = 1;
+                                }
+                                this.updateWeightCellDisplay(cell, weights[i]);
+                                this.isEditingWeights = false;
+                                this.forwardPass();
+                            }, 500);
+                        });
+                        
+                        cell.addEventListener('mouseup', () => {
+                            this.isEditingWeights = false;
+                            if (holdTimeout) {
+                                clearTimeout(holdTimeout);
+                                holdTimeout = null;
+                            }
+                        });
+                        
+                        cell.addEventListener('mouseleave', () => {
+                            this.isEditingWeights = false;
+                            if (holdTimeout) {
+                                clearTimeout(holdTimeout);
+                                holdTimeout = null;
+                            }
+                        });
+                        
+                        cell.addEventListener('contextmenu', (e) => {
+                            e.preventDefault();
+                        });
+                        
+                        container.appendChild(cell);
+                    }
+                }
+                
+                return container;
+            }
+
+            updateWeightCircleDisplay(circle, weight) {
+                const displayWeight = weight === 0 ? 0 : weight;
+                circle.style.backgroundColor = this.getWeightColor(displayWeight);
+                circle.style.color = Math.abs(displayWeight) > 0.4 ? '#fff' : '#000';
+                circle.style.border = '2px solid var(--grid-border)';
+                circle.textContent = displayWeight.toFixed(1);
+            }
+
+            applyWeightPreset(layer, neuron, presetType) {
+                if (layer !== 1) return;
+                
+                const presetPatterns = {
+                    'top-row': [[1,1,1,1,1],[-1,-1,-1,-1,-1],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]],
+                    'mid-row': [[0,0,0,0,0],[-1,-1,-1,-1,-1],[1,1,1,1,1],[-1,-1,-1,-1,-1],[0,0,0,0,0]],
+                    'bottom-row': [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[-1,-1,-1,-1,-1],[1,1,1,1,1]],
+                    'left-col': [[1,-1,0,0,0],[1,-1,0,0,0],[1,-1,0,0,0],[1,-1,0,0,0],[1,-1,0,0,0]],
+                    'mid-col': [[0,-1,1,-1,0],[0,-1,1,-1,0],[0,-1,1,-1,0],[0,-1,1,-1,0],[0,-1,1,-1,0]],
+                    'mid-right-col': [[0,0,-1,1,-1],[0,0,-1,1,-1],[0,0,-1,1,-1],[0,0,-1,1,-1],[0,0,-1,1,-1]],
+                    'right-col': [[0,0,0,-1,1],[0,0,0,-1,1],[0,0,0,-1,1],[0,0,0,-1,1],[0,0,0,-1,1]],
+                    'diagonal': [[0,0,0,0,-1],[0,0,0,-1,1],[0,0,-1,1,-1],[0,-1,1,-1,0],[-1,1,-1,0,0]],
+                    'top-left-curve': [[-1,1,0,0,0],[1,-1,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]],
+                    'top-right-curve': [[0,0,0,1,-1],[0,0,0,-1,1],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]],
+                    'bottom-left-curve': [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[1,-1,0,0,0],[-1,1,0,0,0]],
+                    'bottom-right-curve': [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,-1,1],[0,0,0,1,-1]],
+                    'mid-left-curves': [[0,0,0,0,0],[1,-1,0,0,0],[-1,1,0,0,0],[1,-1,0,0,0],[0,0,0,0,0]],
+                    'mid-right-curves': [[0,0,0,0,0],[0,0,0,-1,1],[0,0,0,1,-1],[0,0,0,-1,1],[0,0,0,0,0]],
+                    'mid-left-mid-top-dot': [[-1,-1,0,0,0],[-1,1,0,0,0],[-1,-1,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
+                };
+                
+                const pattern = presetPatterns[presetType];
+                if (!pattern) return;
+                
+                let idx = 0;
+                for (let i = 0; i < 5; i++) {
+                    for (let j = 0; j < 5; j++) {
+                        this.weights[layer - 1][neuron][idx] = pattern[i][j];
+                        idx++;
+                    }
+                }
+                
+                this.forwardPass();
+                this.showNeuronDetails(layer, neuron);
+            }
+            
+            addNeuron(layer) {
+                // Increment the layer size
+                this.layers[layer]++;
+                
+                // Add bias for the new neuron
+                if (layer === 1) {
+                    // Adding to hidden layer
+                    this.biases[0].push(0);
+                    
+                    // Add weights from input to new hidden neuron
+                    const newInputWeights = new Array(this.layers[0]).fill(0);
+                    this.weights[0].push(newInputWeights);
+                    
+                    // Add weights from new hidden neuron to all output neurons
+                    for (let i = 0; i < this.weights[1].length; i++) {
+                        this.weights[1][i].push(0);
+                    }
+                    
+                } else if (layer === this.layers.length - 1) {
+                    // Adding to output layer
+                    this.biases[1].push(0);
+                    
+                    // Add weights from all hidden neurons to new output neuron
+                    const newOutputWeights = new Array(this.layers[1]).fill(0);
+                    this.weights[1].push(newOutputWeights);
+                }
+                
+                // Add activation slot
+                this.activations[layer].push(0);
+                
+                // Re-render and update
+                this.renderNetwork();
+                this.forwardPass();
+            }
+
+        }
+
+        const visualizer = new NeuralNetworkVisualizer();
+
+        window.addEventListener('resize', () => {
+            visualizer.drawWeights();
+        });
+    </script>
+</body>
+</html>
