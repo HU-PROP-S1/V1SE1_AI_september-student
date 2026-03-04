@@ -384,7 +384,7 @@
         </div>
 
         <!-- Details Section -->
-        <div class="details-section" style="margin-top: 0.5rem; margin-bottom: 0;">
+        <div class="details-section" style="margin-top: 0.5rem; margin-bottom: 0; display: none;" id="detailsSection">
             <div class="section-label" id="neuronDetailsLabel">Neuron Details</div>
             <div id="detailsContent" class="details-content">
                 <div class="info-box">
@@ -699,10 +699,6 @@
                 this.renderNetwork();
                 this.forwardPass(); // Run after rendering to update neuron colors
                 this.setupEventListeners();
-                
-                setTimeout(() => {
-                    this.showNeuronDetails(1, 0);
-                }, 150);
             }
 
             setupEventListeners() {
@@ -1289,6 +1285,12 @@
 
                 if (!this.activations || this.activations.length <= layer - 1) {
                     return;
+                }
+
+                // Show the details section
+                const detailsSection = document.getElementById('detailsSection');
+                if (detailsSection) {
+                    detailsSection.style.display = 'block';
                 }
 
                 this.selectedLayer = layer;
