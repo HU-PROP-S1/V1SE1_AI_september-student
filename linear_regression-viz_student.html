@@ -1010,8 +1010,6 @@ document.getElementById('btn-gd').addEventListener('click', () => {
   // Capture starting values so GD always begins from current params
   let a = params.a;
   let b = params.b;
-  // Draw the current state immediately so the start position is visible
-  draw();
 
   function step() {
     if(!gdRunning || iter >= maxIter) {
@@ -1021,17 +1019,13 @@ document.getElementById('btn-gd').addEventListener('click', () => {
       return;
     }
 
-    // Scale steps per frame so animation always spans ~300 frames
-    const stepsPerFrame = iter < 100 ? 1 : Math.min(200, Math.max(1, Math.floor(maxIter / 300)));
-    for(let s=0;s<stepsPerFrame;s++) {
+    const stepsPerFrame = Math.max(1, Math.floor(maxIter / 300));
+    for(let s = 0; s < stepsPerFrame; s++) {
       const {da, db} = gradients(a, b);
-      // Clip gradients so no single step moves more than 0.1 units
-      const gradNorm = Math.sqrt(da*da + db*db) || 1;
-      const maxStep = 0.1;
-      const scale = Math.min(1, maxStep / (lr * gradNorm));
-      a -= lr * da * scale;
-      b -= lr * db * scale;
+      a -= lr * da;
+      b -= lr * db;
       iter++;
+      if(iter >= maxIter) break;
     }
     params.a = a;
     params.b = b;
@@ -1044,8 +1038,8 @@ document.getElementById('btn-gd').addEventListener('click', () => {
     document.getElementById('iter-label').textContent = `Iteration ${iter} / ${maxIter}`;
 
     // Check convergence
-    const {da, db} = gradients(a, b);
-    if(Math.abs(da) < 1e-7 && Math.abs(db) < 1e-9) {
+    const {da: da2, db: db2} = gradients(a, b);
+    if(Math.abs(da2) < 1e-7 && Math.abs(db2) < 1e-9) {
       gdRunning = false;
       document.getElementById('btn-gd').textContent = 'Run Gradient Descent';
       document.getElementById('iter-label').textContent = `Converged at iter ${iter}`;
