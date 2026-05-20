@@ -1460,9 +1460,10 @@
                     weightsDiv.appendChild(weightComponent);
                     
                 } else if (layer === 2) {
-                    // Output layer: show H1 neuron titles
+                    // Output layer: show H1 neuron titles (dynamically based on actual hidden layer size)
                     const h1PresetNames = [];
-                    for (let i = 0; i < 15; i++) {
+                    const numHiddenNeurons = this.layers[1]; // Get actual number of hidden neurons
+                    for (let i = 0; i < numHiddenNeurons; i++) {
                         const h1Weights = this.weights[0][i];
                         const presetName = this.detectPresetName(h1Weights);
                         h1PresetNames.push(presetName);
@@ -1473,7 +1474,7 @@
                     circlesContainer.style.flexDirection = 'column';
                     circlesContainer.style.gap = '8px';
                     
-                    for (let i = 0; i < 15; i++) {
+                    for (let i = 0; i < numHiddenNeurons; i++) {
                         const row = document.createElement('div');
                         row.style.display = 'flex';
                         row.style.alignItems = 'center';
