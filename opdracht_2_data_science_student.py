@@ -138,8 +138,13 @@ def cor(x, y):
     Returns:
         float: Pearsons correlatiecoëfficient r.
     """
+    
+    numerator = 0
 
-    return
+    denominator = std(x) * std(y)
+
+    return 0.0 if denominator == 0 else numerator / denominator                                              
+
 
 
 

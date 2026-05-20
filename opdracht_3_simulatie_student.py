@@ -30,7 +30,6 @@ debuginfo = True
 """
 1. Implementatie is_always_defect
     Implementeer onderstaande functie om te achterhalen of de tegenstander 'Always defect' is.
-
 """
 def is_always_defect(my_history, opponent_history):
     """
@@ -46,28 +45,8 @@ def is_always_defect(my_history, opponent_history):
     return
 
 """
-2. Implementatie play_against_always_defect
-    Implementeer onderstaande functie om de beste actie te spelen tegen 'Always defect'.
-
-"""
-def play_against_always_defect(my_history, opponent_history):
-    """
-    Geeft de actie terug die gespeeld zal worden tegen 'Always defect' door jouw agent, 
-    gegeven jouw en jouw tegenstanders' acties in het verleden.
-
-    Args:
-        my_history (list[bool]): Een lijst met jouw gespeelde acties in het verleden.
-        opponent_history (list[bool]): Een lijst de door jouw tegenstander gespeelde acties in het verleden.
-
-    Returns:
-        bool: Jouw actie; samenwerken (True) of zelfzuchtig zijn (False).
-    """
-    return
-
-"""
-3. Implementatie is_alternate
+2. Implementatie is_alternate
     Implementeer onderstaande functie om te achterhalen of de tegenstander 'Alternate' is.
-
 """
 def is_alternate(my_history, opponent_history):
     """
@@ -83,28 +62,8 @@ def is_alternate(my_history, opponent_history):
     return
 
 """
-4. Implementatie play_against_alternate
-    Implementeer onderstaande functie om de beste actie te spelen tegen 'Alternate'.
-
-"""
-def play_against_alternate(my_history, opponent_history):
-    """
-    Geeft de actie terug die gespeeld zal worden tegen 'Alternate' door jouw agent, 
-    gegeven jouw en jouw tegenstanders' acties in het verleden.
-
-    Args:
-        my_history (list[bool]): Een lijst met jouw gespeelde acties in het verleden.
-        opponent_history (list[bool]): Een lijst de door jouw tegenstander gespeelde acties in het verleden.
-
-    Returns:
-        bool: Jouw actie; samenwerken (True) of zelfzuchtig zijn (False).
-    """
-    return
-
-"""
-5. Implementatie is_tit_for_tat
+3. Implementatie is_tit_for_tat
     Implementeer onderstaande functie om te achterhalen of de tegenstander 'Tit for tat' is.
-
 """
 def is_tit_for_tat(my_history, opponent_history):
     """
@@ -120,47 +79,8 @@ def is_tit_for_tat(my_history, opponent_history):
     return
 
 """
-6. Implementatie play_against_tit_for_tat
-    Implementeer onderstaande functie om de beste actie te spelen tegen 'Tit for tat'.
-
-"""
-def play_against_tit_for_tat(my_history, opponent_history):
-    """
-    Geeft de actie terug die gespeeld zal worden tegen 'Tit for tat' door jouw agent, 
-    gegeven jouw en jouw tegenstanders' acties in het verleden.
-
-    Args:
-        my_history (list[bool]): Een lijst met jouw gespeelde acties in het verleden.
-        opponent_history (list[bool]): Een lijst de door jouw tegenstander gespeelde acties in het verleden.
-
-    Returns:
-        bool: Jouw actie; samenwerken (True) of zelfzuchtig zijn (False).
-    """
-    return
-
-"""
-7. Implementatie play_against_unknown
-    Implementeer onderstaande functie om de beste actie te spelen tegen een (nog) onbekende tegenstander.
-
-"""
-def play_against_unknown(my_history, opponent_history):
-    """
-    Geeft de actie terug die gespeeld zal worden tegen een onbekende tegenstander door jouw agent, 
-    gegeven jouw en jouw tegenstanders' acties in het verleden.
-
-    Args:
-        my_history (list[bool]): Een lijst met jouw gespeelde acties in het verleden.
-        opponent_history (list[bool]): Een lijst de door jouw tegenstander gespeelde acties in het verleden.
-
-    Returns:
-        bool: Jouw actie; samenwerken (True) of zelfzuchtig zijn (False).
-    """
-    return
-
-"""
-8. Optioneel: Implementatie is_final_round
+4. Optioneel: Implementatie is_final_round
     Implementeer onderstaande functie om te achterhalen of je in de laatste ronde zit.
-
 """
 def is_final_round(my_history, opponent_history):
     """
@@ -175,25 +95,12 @@ def is_final_round(my_history, opponent_history):
     """
     return
 
-"""
-9. Optioneel: Implementatie play_final_round
-    Implementeer onderstaande functie om de beste actie te spelen in de laatste ronde.
 
 """
-def play_final_round(my_history, opponent_history):
-    """
-    Geeft de actie terug die gespeeld zal worden in de laatste ronde.
+5. Implementatie strategy
+    Implementeer onderstaande functie om de winnende strategie te spelen.
 
-    Args:
-        my_history (list[bool]): Een lijst met jouw gespeelde acties in het verleden.
-        opponent_history (list[bool]): Een lijst de door jouw tegenstander gespeelde acties in het verleden.
-
-    Returns:
-        bool: Jouw actie; samenwerken (True) of zelfzuchtig zijn (False).
-    """
-    return
-
-
+"""
 def strategy(my_history, opponent_history):
     """
     Geeft de actie terug die gespeeld zal worden door jouw agent, 
@@ -206,18 +113,7 @@ def strategy(my_history, opponent_history):
     Returns:
         bool: Jouw actie; samenwerken (True) of zelfzuchtig zijn (False).
     """
-    # 10. Optioneel: uncomment deze code en implementeer is_final_round en play_final_round
-    # if is_final_round(my_history, opponent_history):
-    #     return play_final_round(my_history, opponent_history)
-    
-    if is_always_defect(my_history, opponent_history):
-        return play_against_always_defect(my_history, opponent_history)
-    elif is_alternate(my_history, opponent_history):
-        return play_against_alternate(my_history, opponent_history)
-    elif is_tit_for_tat(my_history, opponent_history):
-        return play_against_tit_for_tat(my_history, opponent_history)
-    else:
-        return play_against_unknown(my_history, opponent_history)
+    return
 
 def always_defect(my_history, opponent_history):
     """
@@ -267,7 +163,16 @@ strategies = {
     "Jouw strategie": strategy
 }
 
-def play_game(strategy1, strategy2, rounds):
+class strategyError(Exception):
+    """Exception raised for incorrect strategy prediction.
+
+    """
+
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
+
+def play_game(name1, name2, strategy1, strategy2, rounds):
     """
     Speelt een aantal ronden van het repeated prisoner's dilemma tussen twee agents.
 
@@ -292,6 +197,11 @@ def play_game(strategy1, strategy2, rounds):
             history.append((action1, action2))
         except Exception as e:
             errors.append(str(e))
+
+
+    history1 = [h[0] for h in history]
+    history2 = [h[1] for h in history]
+    
     return calculate_scores(history), errors
 
 def calculate_scores(history):
@@ -336,7 +246,7 @@ def run_tournament(strategies, rounds):
             if name1 < name2:
                 if debuginfo:
                     print(f"{name1} vs {name2}")
-                (score1, score2), errors = play_game(strat1, strat2, rounds)
+                (score1, score2), errors = play_game(name1, name2, strat1, strat2, rounds)
                 results[(name1, name2)] = (score1, score2)
                 total_scores[name1] += score1
                 total_scores[name2] += score2
